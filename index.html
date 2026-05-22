@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOUBA DIGITAL — Agence digitale, Gaming & SaaS · Côte d'Ivoire</title>
+<link rel="icon" type="image/png" href="assets/logo-mark.png" />
+<link rel="apple-touch-icon" href="assets/logo-mark.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        oklch(0.995 0.004 235);    /* near white, cool */
+    --bg-2:      oklch(0.972 0.012 235);    /* soft blue-tinted off-white */
+    --bg-3:      oklch(0.955 0.022 235);    /* pale blue surface */
+    --ink:       oklch(0.26 0.030 250);     /* soft deep navy */
+    --ink-soft:  oklch(0.46 0.022 245);
+    --ink-mute:  oklch(0.62 0.018 240);
+    --line:      oklch(0.90 0.018 235);
+    --line-soft: oklch(0.95 0.014 235);
+    --accent:    oklch(0.78 0.090 235);     /* soft light blue */
+    --accent-ink:oklch(0.52 0.110 240);     /* deeper blue for type */
+    --accent-soft: oklch(0.94 0.040 235);   /* tint surface */
+    --accent-2:  oklch(0.80 0.060 215);     /* secondary cool */
+    --dark:      oklch(0.32 0.040 250);     /* softened navy panel */
+    --on-dark:   oklch(0.98 0.008 235);
+    --r-lg: 22px; --r-md: 14px; --r-sm: 8px;
+    --maxw: 1400px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family: "Geist","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink);
+    font-size:16px; line-height:1.55; letter-spacing:-0.005em;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{ background:var(--accent); color:var(--bg) }
+  a{color:inherit; text-decoration:none}
+  img{display:block; max-width:100%}
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px }
+  .mono{ font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-mute) }
+  .serif{ font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400 }
+  .display{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-weight:400; letter-spacing:-0.025em; line-height:1.0;
+    font-variation-settings:"opsz" 96;
+  }
+  h1,h2,h3,h4{ margin:0 }
+  p{ margin:0 }
+  hr.rule{ border:0; border-top:1px solid var(--line); margin:0 }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:color-mix(in oklab, var(--bg) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav-row{
+    display:flex; align-items:center; justify-content:space-between;
+    height:68px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-0.01em }
+  .brand-mark{
+    width:36px; height:32px; border-radius:8px;
+    background:var(--dark);
+    display:grid; place-items:center;
+    padding:6px 8px;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--dark) 90%, transparent), 0 6px 18px -10px color-mix(in oklab, var(--dark) 60%, transparent);
+  }
+  .brand-mark img{ width:100%; height:auto; display:block }
+  .brand b{ font-weight:700; letter-spacing:0.02em; font-size:14.5px }
+  .brand i{ font-style:normal; color:var(--ink-mute); font-size:14.5px; margin-left:2px; font-weight:400 }
+  .nav-links{ display:flex; gap:28px; font-size:14px; color:var(--ink-soft) }
+  .nav-links a{ position:relative; padding:6px 0 }
+  .nav-links a:hover{ color:var(--ink) }
+  .nav-cta{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--accent-ink); color:var(--on-dark);
+    padding:10px 16px; border-radius:999px;
+    font-size:13.5px; font-weight:500;
+    transition:transform .2s ease, background .2s;
+  }
+  .nav-cta:hover{ background:var(--ink); transform:translateY(-1px) }
+  .nav-cta .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent) }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:64px 0 56px; position:relative; overflow:hidden }
+  .hero-top{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:32px; margin-bottom:42px;
+  }
+  .hero-top .badge{
+    display:inline-flex; align-items:center; gap:10px;
+    border:1px solid var(--line); padding:8px 14px; border-radius:999px;
+    background:color-mix(in oklab, var(--bg) 60%, white);
+    font-size:12.5px; color:var(--ink-soft);
+  }
+  .hero-top .badge .pulse{
+    width:7px; height:7px; border-radius:50%; background:var(--accent-ink);
+    box-shadow:0 0 0 0 color-mix(in oklab, var(--accent-ink) 50%, transparent);
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 color-mix(in oklab, var(--accent-ink) 40%, transparent) }
+    70%{ box-shadow:0 0 0 10px transparent }
+    100%{ box-shadow:0 0 0 0 transparent }
+  }
+  .hero-meta{ font-size:12.5px; color:var(--ink-mute); text-align:right; line-height:1.5 }
+
+  .hero h1{
+    font-size: clamp(46px, 8.4vw, 132px);
+    color:var(--ink);
+    font-weight:400;
+  }
+  .hero h1 .row{ display:block; }
+  .hero h1 .accent{ color:var(--accent-ink); font-weight:500 }
+  .hero h1 .serif{ font-size:0.96em; padding-right:0.08em; color:var(--accent-ink) }
+
+  .hero-foot{
+    margin-top:48px;
+    display:grid; grid-template-columns: 1.1fr 0.9fr;
+    gap:48px; align-items:end;
+  }
+  .lede{
+    font-size:19px; line-height:1.5; color:var(--ink-soft);
+    max-width:560px; text-wrap:pretty; font-weight:400;
+  }
+  .lede b{ color:var(--ink); font-weight:500 }
+  .cta-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 20px; border-radius:999px;
+    font-size:14px; font-weight:500;
+    border:1px solid var(--accent-ink); background:var(--accent-ink); color:var(--on-dark);
+    transition:transform .2s ease, background .2s, color .2s, border-color .2s;
+  }
+  .btn:hover{ transform:translateY(-1px); background:var(--ink); border-color:var(--ink) }
+  .btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line) }
+  .btn.ghost:hover{ background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent) }
+  .btn svg{ width:14px; height:14px }
+
+  /* marquee strip */
+  .marquee{
+    margin-top:64px;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    overflow:hidden; padding:18px 0; background:var(--bg-2);
+    position:relative;
+  }
+  .marquee::before, .marquee::after{
+    content:""; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
+  }
+  .marquee::before{ left:0; background:linear-gradient(90deg, var(--bg-2), transparent) }
+  .marquee::after{ right:0; background:linear-gradient(270deg, var(--bg-2), transparent) }
+  .marquee-track{
+    display:flex; gap:48px; white-space:nowrap;
+    animation: scroll 38s linear infinite;
+    font-family:"Bricolage Grotesque",sans-serif; font-weight:400;
+    font-size:20px; letter-spacing:-0.005em; color:var(--ink-soft);
+  }
+  .marquee-track span{ display:inline-flex; align-items:center; gap:48px }
+  .marquee-track .dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent) }
+  @keyframes scroll{ from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
+
+  /* ---------- SECTION SHELL ---------- */
+  section{ padding:120px 0 }
+  .sec-head{
+    display:grid; grid-template-columns: 200px 1fr; gap:48px;
+    align-items:start; margin-bottom:64px;
+  }
+  .sec-head .label{ position:sticky; top:96px }
+  .sec-head h2{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-weight:400; letter-spacing:-0.02em; line-height:1.05;
+    font-size:clamp(34px, 4.2vw, 58px);
+    max-width:18ch; text-wrap:balance;
+    color:var(--ink);
+  }
+  .sec-head .kicker{ font-size:14px; color:var(--ink-mute); margin-top:18px; max-width:60ch }
+
+  /* ---------- PÔLES ---------- */
+  .poles{ display:flex; flex-direction:column; border-top:1px solid var(--line) }
+  .pole{
+    display:grid; grid-template-columns: 110px 1.05fr 1.4fr 1fr;
+    gap:32px; padding:48px 0;
+    border-bottom:1px solid var(--line);
+    align-items:start;
+    transition:background .25s ease;
+  }
+  .pole:hover{ background:color-mix(in oklab, var(--accent-soft) 50%, var(--bg)) }
+  .pole .num{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-weight:500; font-size:48px; letter-spacing:-0.04em;
+    color:var(--ink-mute); line-height:1;
+  }
+  .pole h3{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:32px; font-weight:500; letter-spacing:-0.02em; line-height:1.05;
+  }
+  .pole .role{ font-size:12.5px; color:var(--ink-mute); margin-top:10px; font-family:"JetBrains Mono",monospace; letter-spacing:0.04em; text-transform:uppercase }
+  .pole .lead{ font-size:16px; color:var(--ink-soft); line-height:1.5; max-width:48ch }
+  .pole .lead b{ color:var(--ink); font-weight:500 }
+  .pole ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px }
+  .pole li{
+    font-size:14px; color:var(--ink); display:flex; gap:10px; align-items:flex-start;
+    padding-left:0;
+  }
+  .pole li::before{
+    content:""; display:inline-block;
+    width:6px; height:6px; margin-top:8px; border-radius:50%;
+    background:var(--accent); flex:0 0 auto;
+  }
+  .pole.p2 li::before{ background:var(--accent-2) }
+  .pole.p3 li::before{ background:var(--accent-ink) }
+  .pole .arrow{
+    align-self:flex-start;
+    width:48px; height:48px; border-radius:50%;
+    border:1px solid var(--line); display:grid; place-items:center;
+    color:var(--ink); transition:all .25s ease;
+    margin-left:auto;
+  }
+  .pole:hover .arrow{ background:var(--accent-ink); color:var(--on-dark); border-color:var(--accent-ink); transform:rotate(-45deg) }
+
+  /* ---------- VISION (light band) ---------- */
+  .vision{
+    background:var(--bg-3); color:var(--ink);
+    border-radius:32px;
+    margin: 0 0 120px;
+    padding:96px 64px 80px;
+    position:relative; overflow:hidden;
+    border:1px solid var(--line-soft);
+  }
+  .vision::before{
+    content:""; position:absolute; right:-200px; top:-200px;
+    width:560px; height:560px; border-radius:50%;
+    background:radial-gradient(circle, color-mix(in oklab, var(--accent) 65%, transparent), transparent 65%);
+    filter:blur(8px); opacity:.55;
+  }
+  .vision-quote{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:clamp(30px, 3.6vw, 52px);
+    font-weight:400; letter-spacing:-0.02em; line-height:1.1;
+    max-width:26ch; text-wrap:balance;
+    position:relative; z-index:1;
+    color:var(--ink);
+  }
+  .vision-quote .serif{ color:var(--accent-ink) }
+  .vision-grid{
+    margin-top:80px;
+    display:grid; grid-template-columns: repeat(3,1fr); gap:32px;
+    position:relative; z-index:1;
+  }
+  .vision-cell{ border-top:1px solid var(--line); padding-top:24px }
+  .vision-cell .mono{ color:var(--ink-mute) }
+  .vision-cell h4{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:20px; font-weight:500; letter-spacing:-0.012em;
+    margin:14px 0 10px;
+    color:var(--ink);
+  }
+  .vision-cell p{ font-size:14.5px; color:var(--ink-soft); line-height:1.55 }
+
+  /* ---------- PROCESS ---------- */
+  .process{ border-top:1px solid var(--line) }
+  .steps{ display:grid; grid-template-columns: repeat(4,1fr); gap:0; border-bottom:1px solid var(--line) }
+  .step{
+    padding:32px 24px 40px;
+    border-left:1px solid var(--line);
+    display:flex; flex-direction:column; gap:18px;
+    min-height:280px;
+  }
+  .step:first-child{ border-left:0 }
+  .step .num{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:28px; font-weight:500; color:var(--ink-mute); letter-spacing:-0.02em;
+  }
+  .step h4{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:22px; font-weight:500; letter-spacing:-0.015em; line-height:1.1;
+    color:var(--ink);
+  }
+  .step p{ font-size:13.5px; color:var(--ink-soft); line-height:1.55 }
+
+  /* ---------- RÉALISATIONS / WORKS ---------- */
+  .works{
+    display:grid; grid-template-columns: repeat(6, 1fr);
+    gap:20px;
+  }
+  .work{ grid-column: span 3 }
+  .work.w-lg{ grid-column: span 6 }
+  .work-card{
+    display:block; border:1px solid var(--line); border-radius:var(--r-lg);
+    background:var(--bg); overflow:hidden;
+    transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .work-card:hover{
+    transform:translateY(-4px); border-color:var(--accent);
+    box-shadow:0 24px 56px -28px color-mix(in oklab, var(--accent-ink) 30%, transparent);
+  }
+  .work-canvas{
+    aspect-ratio: 16 / 10;
+    border-bottom:1px solid var(--line-soft);
+    position:relative; overflow:hidden;
+    background:var(--bg-3);
+  }
+  .work.w-lg .work-canvas{ aspect-ratio: 21 / 9 }
+  .work-canvas-inner{
+    position:absolute; inset:0;
+    display:grid; place-items:center;
+    color:var(--ink-mute);
+  }
+  .work-glyph{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:clamp(36px, 6vw, 84px);
+    font-weight:400; letter-spacing:-0.025em;
+    color:color-mix(in oklab, var(--accent-ink) 55%, var(--bg-3));
+    mix-blend-mode:multiply;
+  }
+  .work-card:hover .work-glyph{ color:var(--accent-ink) }
+
+  .work-canvas[data-pattern]::before{
+    content:""; position:absolute; inset:0;
+    opacity:.55;
+  }
+  .work-canvas[data-pattern="a"]::before{
+    background:
+      radial-gradient(circle at 25% 30%, color-mix(in oklab, var(--accent) 60%, transparent) 0 18%, transparent 19%),
+      radial-gradient(circle at 75% 70%, color-mix(in oklab, var(--accent-2) 50%, transparent) 0 22%, transparent 23%),
+      linear-gradient(135deg, var(--bg-3), var(--accent-soft));
+  }
+
+  .work-meta{ padding:22px 22px 24px; display:flex; flex-direction:column; gap:10px }
+  .work-tags{ display:flex; gap:8px; align-items:center }
+  .tag-pole, .tag-year{
+    font-family:"JetBrains Mono",monospace; font-size:11px;
+    letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 10px; border-radius:999px;
+    border:1px solid var(--line); color:var(--ink-soft);
+    background:var(--bg);
+  }
+  .tag-pole.p3{ background:var(--dark); color:var(--on-dark); border-color:var(--dark) }
+  .work-meta h3{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:22px; font-weight:500; letter-spacing:-0.018em; line-height:1.2;
+    color:var(--ink);
+  }
+  .work.w-lg .work-meta h3{ font-size:28px }
+  .work-meta p{ font-size:14px; color:var(--ink-soft); line-height:1.5; max-width:62ch }
+
+  /* Logo wall */
+  .clients{ margin-top:64px }
+  .clients-head{
+    display:flex; align-items:center; gap:18px; margin-bottom:28px;
+  }
+  .clients-head .clients-line{
+    flex:1; height:1px; background:var(--line);
+  }
+  .logo-wall{
+    display:grid; grid-template-columns: repeat(5, 1fr);
+    border:1px solid var(--line-soft); border-radius:var(--r-lg);
+    background:var(--bg);
+    overflow:hidden;
+  }
+  .logo-slot{
+    aspect-ratio: 5/3;
+    display:grid; place-items:center;
+    border-right:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line-soft);
+    background:
+      repeating-linear-gradient(45deg, transparent 0 14px, color-mix(in oklab, var(--ink) 4%, transparent) 14px 15px),
+      var(--bg);
+    font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--ink-mute);
+    transition:background .25s ease, color .25s ease;
+  }
+  .logo-slot:hover{
+    background:var(--accent-soft); color:var(--accent-ink);
+  }
+  .logo-slot:nth-child(5n){ border-right:0 }
+  .logo-slot:nth-last-child(-n+5){ border-bottom:0 }
+  .logo-slot.has-logo{
+    background: var(--bg) !important;
+    padding: 12px 18px;
+    gap: 8px;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-slot.has-logo.dark-bg{
+    background: var(--dark) !important;
+  }
+  .logo-slot.has-logo img{
+    max-height: 72px; max-width: 80%; object-fit: contain; display: block;
+  }
+  .logo-slot.has-logo.full-logo img{
+    max-height: 60px; max-width: 88%;
+  }
+  .logo-slot.has-logo .lname{
+    font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--ink-mute);
+  }
+  .logo-slot.has-logo.dark-bg .lname{ color:var(--on-dark); opacity:.6 }
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:var(--accent-soft);
+    border-radius:32px;
+    padding:96px 64px 88px;
+    color:var(--ink);
+    position:relative; overflow:hidden;
+    margin-bottom:72px;
+    border:1px solid var(--line-soft);
+  }
+  .cta::before{
+    content:""; position:absolute; left:-160px; bottom:-220px;
+    width:560px; height:560px; border-radius:50%;
+    background:radial-gradient(circle, color-mix(in oklab, var(--accent) 60%, transparent), transparent 65%);
+    filter:blur(8px); opacity:.6;
+  }
+  .cta-inner{ position:relative; z-index:1; display:grid; grid-template-columns: 1.2fr 1fr; gap:48px; align-items:end }
+  .cta h2{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-size:clamp(40px, 5.6vw, 84px);
+    font-weight:400; letter-spacing:-0.025em; line-height:1.0;
+    max-width:14ch; text-wrap:balance;
+    color:var(--ink);
+  }
+  .cta h2 .serif{ color:var(--accent-ink) }
+  .cta-side{ display:flex; flex-direction:column; gap:20px; align-items:flex-start }
+  .cta-side p{ font-size:16px; color:var(--ink-soft); max-width:36ch; line-height:1.5 }
+  .cta .btn{ background:var(--accent-ink); color:var(--on-dark); border-color:var(--accent-ink) }
+  .cta .btn:hover{ background:var(--ink); color:var(--on-dark); border-color:var(--ink) }
+  .cta .btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line) }
+  .cta .btn.ghost:hover{ background:var(--bg); color:var(--accent-ink); border-color:var(--accent) }
+
+  /* ---------- FOOTER ---------- */
+  footer{ padding:48px 0 56px; border-top:1px solid var(--line) }
+  .foot{
+    display:grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap:48px; align-items:start;
+  }
+  .foot h5{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:14px; font-weight:500 }
+  .foot ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--ink-soft) }
+  .foot ul a:hover{ color:var(--ink) }
+  .foot .brand-blk b{ font-family:"Bricolage Grotesque",sans-serif; font-size:28px; font-weight:500; letter-spacing:-0.02em; display:block; color:var(--ink) }
+  .foot-logo{
+    width:88px; height:72px; border-radius:12px;
+    background:var(--dark);
+    display:grid; place-items:center;
+    padding:14px 18px;
+    margin-bottom:18px;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--dark) 90%, transparent), 0 12px 28px -16px color-mix(in oklab, var(--dark) 60%, transparent);
+  }
+  .foot-logo img{ width:100%; height:auto; display:block }
+  .foot .brand-blk p{ font-size:13.5px; color:var(--ink-soft); margin-top:10px; max-width:40ch; line-height:1.55 }
+  .foot-bottom{
+    margin-top:48px; padding-top:24px; border-top:1px solid var(--line-soft);
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-mute);
+    font-family:"JetBrains Mono",monospace; letter-spacing:0.04em;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px){
+    .wrap{ padding:0 20px }
+    .hero-top{ flex-direction:column; align-items:flex-start; gap:16px }
+    .hero-meta{ text-align:left }
+    .hero-foot{ grid-template-columns:1fr; gap:28px; margin-top:32px }
+    .cta-row{ justify-content:flex-start }
+    .sec-head{ grid-template-columns:1fr; gap:14px }
+    .sec-head .label{ position:static }
+    .pole{ grid-template-columns: 60px 1fr; gap:14px }
+    .pole .lead, .pole ul, .pole .arrow{ grid-column: 2 }
+    .pole .arrow{ display:none }
+    .vision{ padding:56px 28px; border-radius:20px }
+    .vision-grid{ grid-template-columns:1fr; gap:24px; margin-top:48px }
+    .steps{ grid-template-columns:1fr }
+    .step{ border-left:0; border-top:1px solid var(--line) }
+    .step:first-child{ border-top:0 }
+    .cta{ padding:56px 28px; border-radius:20px }
+    .cta-inner{ grid-template-columns:1fr; gap:24px }
+    .foot{ grid-template-columns:1fr 1fr; gap:32px }
+    .nav-links{ display:none }
+    .works{ grid-template-columns: 1fr; gap:16px }
+    .work, .work.w-lg{ grid-column: span 1 }
+    .logo-wall{ grid-template-columns: 1fr !important }
+    .logo-slot{ border-right:0 !important }
+    .logo-slot:not(:last-child){ border-bottom:1px solid var(--line-soft) !important }
+    .logo-slot:last-child{ border-bottom:0 !important }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.png" alt="" /></span>
+      <span><b>SOUBA</b> <i>Digital</i></span>
+    </a>
+    <div class="nav-links">
+      <a href="#poles">Pôles</a>
+      <a href="#realisations">Réalisations</a>
+      <a href="#vision">Vision</a>
+      <a href="#process">Méthode</a>
+    </div>
+    <a class="nav-cta" href="#contact"><span class="dot"></span>Démarrer un projet</a>
+  </div>
+</nav>
+
+<a id="top"></a>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="hero-top">
+    <div class="badge"><span class="pulse"></span>Basé à Abidjan · Côte d'Ivoire · 2026</div>
+    <div class="hero-meta">
+      ESN · Agence digitale · Gaming &amp; Location · SaaS<br>
+      Construire un écosystème digital panafricain.
+    </div>
+  </div>
+
+  <h1 class="display">
+    <span class="row">Le <span class="serif">digital,</span></span>
+    <span class="row">pensé pour</span>
+    <span class="row">l'<span class="accent">Afrique</span>.</span>
+  </h1>
+
+  <div class="hero-foot">
+    <p class="lede">
+      SOUBA DIGITAL est un <b>groupe entrepreneurial ivoirien</b> qui combine prestation de services numériques,
+      exploitation de salles de jeu modernes et développement d'un SaaS de gestion.
+      Trois pôles, une mission&nbsp;: rendre la transformation digitale et le divertissement
+      <b>accessibles, rentables et durables</b> pour les PME et les jeunes africains.
+    </p>
+    <div class="cta-row">
+      <a class="btn ghost" href="#poles">
+        Découvrir nos pôles
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+      </a>
+      <a class="btn" href="#contact">
+        Démarrer un projet
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>
+      Sites web sur-mesure <span class="dot"></span>
+      Identité &amp; Design <span class="dot"></span>
+      Automatisation <span class="dot"></span>
+      Salles de gaming <span class="dot"></span>
+      Location de consoles <span class="dot"></span>
+      Logiciel SaaS de gestion <span class="dot"></span>
+      Stratégie digitale <span class="dot"></span>
+      Marketing local <span class="dot"></span>
+    </span>
+    <span>
+      Sites web sur-mesure <span class="dot"></span>
+      Identité &amp; Design <span class="dot"></span>
+      Automatisation <span class="dot"></span>
+      Salles de gaming <span class="dot"></span>
+      Location de consoles <span class="dot"></span>
+      Logiciel SaaS de gestion <span class="dot"></span>
+      Stratégie digitale <span class="dot"></span>
+      Marketing local <span class="dot"></span>
+    </span>
+  </div>
+</div>
+
+<!-- PÔLES -->
+<section id="poles" class="wrap">
+  <div class="sec-head">
+    <div class="label">
+      <div class="mono">§01 — Services</div>
+    </div>
+    <div>
+      <h2>Trois pôles, un écosystème intégré.</h2>
+      <p class="kicker">
+        Chacun de nos pôles fonctionne en autonomie opérationnelle, mais partage la même
+        infrastructure, la même équipe technique et la même ambition&nbsp;: une rentabilité
+        scalable à l'échelle ouest-africaine.
+      </p>
+    </div>
+  </div>
+
+  <div class="poles">
+
+    <article class="pole p1">
+      <div class="num">01</div>
+      <div>
+        <h3>Agence<br>Digitale</h3>
+        <div class="role">Pôle 1 · Transformation numérique</div>
+      </div>
+      <p class="lead">
+        Nous accompagnons les <b>PME et entrepreneurs africains</b> dans leur transformation numérique&nbsp;:
+        sites web sur-mesure, identité visuelle, design produit et automatisation des process métier.
+        Notre approche est <b>locale, rapide, rentable</b>.
+      </p>
+      <ul>
+        <li>Sites vitrines &amp; e-commerce</li>
+        <li>Identité de marque &amp; UI/UX</li>
+        <li>Automatisations &amp; outils internes</li>
+        <li>Stratégie de contenu &amp; SEO local</li>
+        <li>Maintenance &amp; hébergement</li>
+      </ul>
+      <a class="arrow" href="#contact" aria-label="En savoir plus sur le pôle Agence Digitale">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </article>
+
+    <article class="pole p2">
+      <div class="num">02</div>
+      <div>
+        <h3>Gaming<br>&amp; Location</h3>
+        <div class="role">Pôle 2 · Divertissement &amp; événementiel</div>
+      </div>
+      <p class="lead">
+        Des <b>espaces de divertissement modernes</b> et un service de <b>location de consoles</b> pour
+        particuliers, anniversaires et événements d'entreprise.
+        Une infrastructure stable, un staff formé, un cadre sécurisé.
+      </p>
+      <ul>
+        <li>Salles de jeux PS5 / Xbox</li>
+        <li>Tournois &amp; soirées gaming</li>
+        <li>Location courte durée (24h+)</li>
+        <li>Événementiel &amp; activations</li>
+        <li>Coin streaming &amp; merchandising</li>
+      </ul>
+      <a class="arrow" href="#contact" aria-label="En savoir plus sur le pôle Gaming">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </article>
+
+    <article class="pole p3">
+      <div class="num">03</div>
+      <div>
+        <h3>SaaS &amp;<br>Technologie</h3>
+        <div class="role">Pôle 3 · Produit &amp; ingénierie</div>
+      </div>
+      <p class="lead">
+        Un <b>logiciel SaaS de gestion</b> conçu pour les salles de jeu et leurs clients&nbsp;:
+        suivi des consoles, sessions, paiements, fidélité et reporting.
+        Pensé en Afrique, pour l'Afrique.
+      </p>
+      <ul>
+        <li>Gestion temps réel des sessions</li>
+        <li>Caisse &amp; paiement mobile</li>
+        <li>Fidélité &amp; CRM joueurs</li>
+        <li>Reporting &amp; analytics</li>
+        <li>API ouverte &amp; intégrations</li>
+      </ul>
+      <a class="arrow" href="#contact" aria-label="En savoir plus sur le pôle SaaS">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </article>
+
+  </div>
+</section>
+
+<!-- RÉALISATIONS -->
+<section id="realisations" class="wrap">
+  <div class="sec-head">
+    <div class="label"><div class="mono">§02 — Réalisations</div></div>
+    <div>
+      <h2>Notre produit phare et nos partenaires.</h2>
+      <p class="kicker">
+        Notre principale réalisation à ce jour est notre plateforme SaaS de gestion. Elle s'accompagne
+        d'une croissance régulière de clients et partenaires qui nous font confiance.
+      </p>
+    </div>
+  </div>
+
+  <div class="works">
+    <article class="work w-lg">
+      <a class="work-card" href="#contact" aria-label="Voir le projet SaaS">
+        <div class="work-canvas" data-pattern="a">
+          <div class="work-canvas-inner">
+            <span class="work-glyph">SaaS</span>
+          </div>
+        </div>
+        <div class="work-meta">
+          <div class="work-tags">
+            <span class="tag-pole p3">Pôle 3 · Produit</span>
+            <span class="tag-year">2026</span>
+          </div>
+          <h3>Plateforme SaaS de gestion</h3>
+          <p>Logiciel de gestion temps réel pour salles de jeu et opérateurs locaux — sessions, caisse, fidélité et reporting consolidé. Notre produit interne, développé en Côte d'Ivoire, pour le marché ouest-africain.</p>
+        </div>
+      </a>
+    </article>
+  </div>
+
+  <div class="clients">
+    <div class="clients-head">
+      <span class="mono">Ils nous font confiance</span>
+      <span class="clients-line" aria-hidden="true"></span>
+    </div>
+    <div class="logo-wall" style="grid-template-columns: repeat(3, 1fr)">
+
+      <!-- ColisDirect -->
+      <div class="logo-slot has-logo full-logo" aria-label="ColisDirect">
+        <img src="assets/colisdirect-logo.png" alt="ColisDirect" />
+      </div>
+
+      <!-- ControlPlay -->
+      <div class="logo-slot has-logo" aria-label="ControlPlay">
+        <img src="assets/controlplay-icon.svg" alt="" aria-hidden="true" />
+        <span class="lname">ControlPlay</span>
+      </div>
+
+      <!-- MasterCota -->
+      <div class="logo-slot has-logo full-logo" aria-label="MasterCota">
+        <img src="assets/mastercota-logo.png" alt="MasterCota" />
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section id="vision" class="wrap" style="padding-top:0">
+  <div class="vision">
+    <p class="mono" style="margin-bottom:24px">§03 — Vision &amp; positionnement</p>
+    <p class="vision-quote">
+      Devenir un acteur <span class="serif">majeur</span> du digital et du divertissement en Afrique de l'Ouest — reconnu pour la qualité, l'innovation et son impact social.
+    </p>
+
+    <div class="vision-grid">
+      <div class="vision-cell">
+        <div class="mono">Vision</div>
+        <h4>Un écosystème digital panafricain</h4>
+        <p>Bâtir un groupe intégré, rentable et scalable à l'échelle de l'Afrique de l'Ouest, capable d'accompagner durablement la jeunesse et les PME.</p>
+      </div>
+      <div class="vision-cell">
+        <div class="mono">Mission</div>
+        <h4>Démocratiser le digital &amp; le gaming</h4>
+        <p>Offrir des solutions numériques accessibles et des expériences gaming modernes, qui favorisent la transformation digitale des jeunes et des petites entreprises.</p>
+      </div>
+      <div class="vision-cell">
+        <div class="mono">Positionnement</div>
+        <h4>Technologie, loisirs, entrepreneuriat</h4>
+        <p>Un écosystème inclusif qui combine trois pôles complémentaires — digital, gaming et SaaS — autour d'une même culture de la performance et de l'impact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="wrap process">
+  <div class="sec-head">
+    <div class="label"><div class="mono">§04 — Méthode</div></div>
+    <div>
+      <h2>Comment nous livrons.</h2>
+      <p class="kicker">
+        Un processus court, transparent et itératif. Pas de jargon, pas de mois perdus —
+        des livraisons rapides, mesurables et adaptées à la réalité ouest-africaine.
+      </p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="num">/01</div>
+      <h4>Cadrage &amp; écoute</h4>
+      <p>On comprend votre métier, vos contraintes locales, votre budget. On définit un objectif clair, mesurable, et un périmètre réaliste.</p>
+    </div>
+    <div class="step">
+      <div class="num">/02</div>
+      <h4>Design &amp; prototype</h4>
+      <p>Maquettes interactives, identité visuelle, validation rapide. Vous voyez le résultat avant qu'on développe une ligne de code.</p>
+    </div>
+    <div class="step">
+      <div class="num">/03</div>
+      <h4>Build &amp; livraison</h4>
+      <p>Développement par sprints courts, démos hebdo, code propre. Hébergement local, sauvegardes, mise en ligne accompagnée.</p>
+    </div>
+    <div class="step">
+      <div class="num">/04</div>
+      <h4>Suivi &amp; croissance</h4>
+      <p>Maintenance mensuelle, suivi des indicateurs, itérations. On grandit avec vous, pas après vous.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact" class="wrap" style="padding-top:0">
+  <div class="cta">
+    <div class="cta-inner">
+      <h2>
+        Parlons<br>de votre <span class="serif">projet</span>.
+      </h2>
+      <div class="cta-side">
+        <p>
+          Vous êtes une PME, un porteur de projet, une salle de jeu ou un investisseur&nbsp;?
+          Écrivez-nous — nous répondons sous 48&nbsp;heures.
+        </p>
+        <div class="cta-row">
+          <a class="btn" href="mailto:contact@soubadigital.com">
+            contact@soubadigital.com
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+          </a>
+          <a class="btn ghost" href="tel:+22500000000">+225 ·· ·· ·· ·· ··</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot">
+    <div class="brand-blk">
+      <div class="foot-logo" aria-hidden="true"><img src="assets/logo-mark.png" alt="SOUBA DIGITAL" /></div>
+      <b>SOUBA <span style="color:var(--ink-mute); font-weight:400">Digital</span></b>
+      <p>Groupe entrepreneurial ivoirien basé à Abidjan, dédié au digital, au gaming et au SaaS pour l'Afrique de l'Ouest.</p>
+    </div>
+    <div>
+      <h5>Pôles</h5>
+      <ul>
+        <li><a href="#poles">Agence Digitale</a></li>
+        <li><a href="#poles">Gaming &amp; Location</a></li>
+        <li><a href="#poles">SaaS &amp; Technologie</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Entreprise</h5>
+      <ul>
+        <li><a href="#realisations">Réalisations</a></li>
+        <li><a href="#vision">Vision</a></li>
+        <li><a href="#process">Méthode</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="mailto:contact@soubadigital.com">contact@soubadigital.com</a></li>
+        <li>Abidjan · Côte d'Ivoire</li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© SOUBA DIGITAL · 2026</span>
+    <span>Tous droits réservés</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = 1;
+        e.target.style.transform = 'translateY(0)';
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.pole, .vision-cell, .step, .work').forEach(el => {
+    el.style.opacity = 0;
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity .7s ease, transform .7s ease';
+    io.observe(el);
+  });
+</script>
+
+</body>
+</html>

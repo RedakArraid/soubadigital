@@ -1,0 +1,25 @@
+services:
+  web:
+    image: nginx:alpine
+    container_name: soubadigital-web
+    restart: unless-stopped
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+    networks:
+      - traefik_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.soubadigital.rule=Host(`soubadigital.com`) || Host(`www.soubadigital.com`)
+      - traefik.http.routers.soubadigital.entrypoints=websecure
+      - traefik.http.routers.soubadigital.tls=true
+      - traefik.http.routers.soubadigital.tls.certresolver=mytlschallenge
+      - traefik.http.services.soubadigital.loadbalancer.server.port=80
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  traefik_network:
+    external: true
