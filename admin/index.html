@@ -243,10 +243,25 @@ function redirectAfterLogin() {
   const params = new URLSearchParams(location.search);
   const target = params.get('redirect');
   if (target && target.startsWith('/admin/')) {
-    location.href = target;
+    location.replace(target);
     return true;
   }
   return false;
+}
+
+async function bootstrap() {
+  if (!token()) return;
+
+  try {
+    await api('/api/auth/sync-cookie', { method: 'POST' });
+    if (redirectAfterLogin()) return;
+    showApp();
+    await loadConfig();
+  } catch {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  }
 }
 
 $('#loginForm').addEventListener('submit', async (e) => {
@@ -260,6 +275,7 @@ $('#loginForm').addEventListener('submit', async (e) => {
     });
     localStorage.setItem(TOKEN_KEY, data.token);
     localStorage.setItem(USER_KEY, data.user);
+    await api('/api/auth/sync-cookie', { method: 'POST' });
     if (!redirectAfterLogin()) {
       showApp();
       await loadConfig();
@@ -416,12 +432,7 @@ $('#saveConfigBtn').addEventListener('click', async () => {
   }
 });
 
-if (token()) {
-  if (!redirectAfterLogin()) {
-    showApp();
-    loadConfig().catch(logout);
-  }
-}
+bootstrap();
 </script>
 </body>
 </html>

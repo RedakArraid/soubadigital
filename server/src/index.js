@@ -4,7 +4,7 @@ import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { authMiddleware, authCookieHeader, clearAuthCookieHeader, pageAuthMiddleware, signToken } from './auth.js';
+import { authMiddleware, authCookieHeader, clearAuthCookieHeader, getAuthToken, pageAuthMiddleware, signToken } from './auth.js';
 import {
   DATA_DIR,
   UPLOADS_DIR,
@@ -81,6 +81,12 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/logout', (_req, res) => {
   res.setHeader('Set-Cookie', clearAuthCookieHeader());
+  res.json({ ok: true });
+});
+
+app.post('/api/auth/sync-cookie', authMiddleware, (req, res) => {
+  const jwt = getAuthToken(req);
+  if (jwt) res.setHeader('Set-Cookie', authCookieHeader(jwt));
   res.json({ ok: true });
 });
 
