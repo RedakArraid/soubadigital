@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Deviseur — SOUBA DIGITAL</title>
-<link rel="icon" type="image/png" href="assets/logo-mark.png" />
+<link rel="icon" type="image/png" href="/assets/logo-mark.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -147,8 +147,11 @@
   .d-tot .grand span{font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.85}
   .d-tot .grand b{font-family:"Bricolage Grotesque",sans-serif; font-size:23px; font-variant-numeric:tabular-nums}
 
-  .d-foot{margin-top:auto; padding-top:26px;
-  .d-foot{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; border-top:1px solid var(--line); margin-top:22px; padding-top:22px}
+  .d-foot{
+    margin-top:auto;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
+    border-top:1px solid var(--line); padding-top:22px;
+  }
   .d-pay{margin-top:30px}
   .d-pay .plabel{font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-mute); font-weight:700; margin-bottom:9px}
   .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
@@ -172,15 +175,31 @@
     .sheet{transform-origin:top left}
   }
 
-  /* ---------- PRINT ---------- */
+  /* ---------- PRINT (spec maquette zip — WYSIWYG A4) ---------- */
   @media print{
-    @page{size:A4; margin:0}
-    html,body,.sheet,.preview-pane{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important}
+    @page{size:A4 portrait; margin:0}
+    *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important}
+    html,body{width:210mm; margin:0 !important; padding:0 !important; background:#fff !important; overflow:visible !important}
     .topbar, .editor{display:none !important}
-    .stage{display:block}
-    .preview-pane{padding:0; background:#fff; display:block; overflow:visible}
-    .sheet-wrap{width:auto}
-    .sheet{box-shadow:none; width:210mm; min-height:297mm; padding:16mm 15mm}
+    .stage{display:block !important; min-height:auto !important}
+    .preview-pane{
+      padding:0 !important; margin:0 !important;
+      background:#fff !important; overflow:visible !important;
+      display:block !important;
+    }
+    .sheet-wrap{width:210mm !important; margin:0 !important}
+    .sheet{
+      box-shadow:none !important;
+      width:210mm !important; min-height:297mm !important;
+      padding:14mm 14mm 12mm !important;
+      margin:0 !important;
+      break-inside:avoid; page-break-inside:avoid;
+    }
+    .sheet .topband{background:linear-gradient(90deg,var(--accent-ink),var(--gold-deep)) !important}
+    table.d-table thead th{background:var(--dark) !important; color:var(--on-dark) !important}
+    .pcard.client{background:var(--bg-2) !important}
+    .pay-card{background:var(--bg-2) !important}
+    .d-tot .grand{background:var(--accent-ink) !important; color:#fff !important}
   }
 </style>
 </head>
@@ -188,7 +207,7 @@
 
 <div class="topbar">
   <div class="brand">
-    <span class="brand-mark"><img src="assets/logo-mark.png" alt="SD" /></span>
+    <span class="brand-mark"><img src="/assets/logo-mark.png" alt="SD" /></span>
     <span><b>SOUBA</b> <i>Digital</i></span>
     <span class="tag">DEVISEUR</span>
   </div>
@@ -266,7 +285,7 @@
 
         <div class="d-head">
           <div class="d-id">
-            <span class="d-mark"><img src="assets/logo-mark.png" alt="SD" /></span>
+            <span class="d-mark"><img src="/assets/logo-mark.png" alt="SD" /></span>
             <div>
               <h1>SOUBA <span>DIGITAL</span></h1>
               <div class="sub">Agence digitale · Gaming · SaaS · Abidjan</div>
@@ -479,7 +498,7 @@ document.querySelectorAll('.editor input, .editor textarea, .editor select').for
   el.addEventListener('input',update);
 });
 $('addItem').addEventListener('click',()=>{ items.push({desc:'',note:'',qty:1,pu:0}); renderItems(); update(); });
-$('printBtn').addEventListener('click',()=>window.print());
+$('printBtn').addEventListener('click', () => window.print());
 $('resetBtn').addEventListener('click',()=>{
   if(confirm('Créer un nouveau devis vierge ? Le devis actuel sera effacé.')){
     localStorage.removeItem(KEY);
