@@ -6,3 +6,19 @@ services:
     volumes:
       - ./:/usr/share/nginx/html:ro
     restart: unless-stopped
+
+  admin:
+    build: ./server
+    ports:
+      - "8091:3000"
+    env_file:
+      - .env
+    environment:
+      - ADMIN_DIR=/app/admin
+      - ASSETS_DIR=/app/assets
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      - ./admin:/app/admin:ro
+      - ./assets:/app/assets:ro
+    restart: unless-stopped

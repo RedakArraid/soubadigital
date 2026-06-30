@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Deviseur — SOUBA DIGITAL</title>
+<link rel="icon" type="image/png" href="assets/logo-mark.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        oklch(0.995 0.004 235);
+    --bg-2:      oklch(0.972 0.012 235);
+    --bg-3:      oklch(0.955 0.022 235);
+    --ink:       oklch(0.26 0.030 250);
+    --ink-soft:  oklch(0.46 0.022 245);
+    --ink-mute:  oklch(0.62 0.018 240);
+    --line:      oklch(0.90 0.018 235);
+    --line-soft: oklch(0.95 0.014 235);
+    --accent:    oklch(0.78 0.090 235);
+    --accent-ink:oklch(0.52 0.110 240);
+    --accent-soft: oklch(0.94 0.040 235);
+    --gold:      oklch(0.78 0.135 70);   /* logo D orange */
+    --gold-deep: oklch(0.66 0.150 62);
+    --dark:      oklch(0.30 0.040 250);
+    --on-dark:   oklch(0.98 0.008 235);
+    --r-lg:18px; --r-md:12px; --r-sm:8px;
+  }
+  *{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Geist","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:var(--bg-2); color:var(--ink);
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-mute)}
+  .display{font-family:"Bricolage Grotesque",sans-serif; letter-spacing:-.02em}
+  button{font-family:inherit}
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; height:62px; padding:0 22px;
+    background:color-mix(in oklab,var(--bg) 90%,transparent);
+    backdrop-filter:blur(14px) saturate(1.1);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .brand{display:flex; align-items:center; gap:11px}
+  .brand-mark{width:36px; height:32px; border-radius:8px; background:var(--dark); display:grid; place-items:center; padding:6px 7px}
+  .brand-mark img{width:100%; display:block}
+  .brand b{font-weight:700; letter-spacing:.02em; font-size:14px}
+  .brand i{font-style:normal; color:var(--ink-mute); font-weight:400; font-size:14px}
+  .brand .tag{margin-left:6px; padding:3px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent-ink); font-size:11px; font-weight:600; letter-spacing:.04em}
+  .actions{display:flex; gap:10px}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:999px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:13.5px; font-weight:500; cursor:pointer; transition:.18s}
+  .btn:hover{border-color:var(--ink-mute)}
+  .btn svg{width:15px; height:15px}
+  .btn.primary{background:var(--accent-ink); border-color:var(--accent-ink); color:var(--on-dark)}
+  .btn.primary:hover{background:var(--ink)}
+  .btn.gold{background:var(--gold-deep); border-color:var(--gold-deep); color:#fff}
+  .btn.gold:hover{filter:brightness(.95)}
+
+  /* ---------- LAYOUT ---------- */
+  .stage{display:grid; grid-template-columns:minmax(380px,440px) 1fr; gap:0; min-height:calc(100vh - 62px)}
+  .editor{padding:24px 22px 80px; overflow:auto; border-right:1px solid var(--line); background:var(--bg)}
+  .preview-pane{padding:34px; overflow:auto; background:
+     repeating-linear-gradient(45deg, var(--bg-3) 0 1px, transparent 1px 11px); display:flex; justify-content:center; align-items:flex-start}
+
+  /* ---------- EDITOR ---------- */
+  .group{margin-bottom:26px}
+  .group > .glabel{display:flex; align-items:center; gap:8px; margin-bottom:12px}
+  .glabel .num{width:20px; height:20px; border-radius:6px; background:var(--accent-soft); color:var(--accent-ink); font-size:11px; font-weight:700; display:grid; place-items:center}
+  .field{margin-bottom:11px}
+  .field label{display:block; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:5px; font-weight:600}
+  .field input, .field textarea, .field select{
+    width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:var(--r-sm);
+    font-family:inherit; font-size:14px; color:var(--ink); background:var(--bg); transition:.15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{outline:none; border-color:var(--accent-ink); box-shadow:0 0 0 3px var(--accent-soft)}
+  .field textarea{resize:vertical; min-height:60px}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+
+  /* line items editor */
+  .items-head{display:grid; grid-template-columns:1fr 56px 92px 30px; gap:8px; padding:0 2px 6px; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute); font-weight:600}
+  .lirow{display:grid; grid-template-columns:1fr 56px 92px 30px; gap:8px; margin-bottom:8px; align-items:start}
+  .lirow input{padding:8px 9px; font-size:13px}
+  .lirow .del{border:1px solid var(--line); background:var(--bg); border-radius:7px; cursor:pointer; color:var(--ink-mute); height:35px; display:grid; place-items:center; transition:.15s}
+  .lirow .del:hover{color:#c0392b; border-color:#e0b4ae}
+  .add-item{margin-top:4px; width:100%; justify-content:center; border-style:dashed}
+
+  .totbox{background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-md); padding:14px; margin-top:14px}
+  .totrow{display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:13.5px; padding:5px 0}
+  .totrow > span:first-child{flex:1; min-width:0}
+  .totrow .mini{flex:0 0 90px; width:90px}
+  .totrow .mini input{width:100%; padding:7px 9px; font-size:13px; text-align:right; border:1px solid var(--line); border-radius:var(--r-sm); font-family:inherit; background:var(--bg)}
+  .totrow .mini input:focus{outline:none; border-color:var(--accent-ink); box-shadow:0 0 0 3px var(--accent-soft)}
+  .totrow.grand{border-top:1px solid var(--line); margin-top:6px; padding-top:11px; font-weight:700; font-size:16px}
+  .totrow.grand b{font-family:"Bricolage Grotesque",sans-serif}
+
+  /* ---------- DEVIS A4 ---------- */
+  .sheet-wrap{width:794px; flex:0 0 auto}
+  .sheet{
+    width:794px; min-height:1123px; background:#fff; color:var(--ink);
+    box-shadow:0 24px 60px -24px rgba(20,30,60,.35), 0 2px 8px rgba(20,30,60,.08);
+    padding:54px 54px 46px; position:relative; display:flex; flex-direction:column;
+  }
+  .sheet .topband{position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--accent-ink),var(--gold-deep))}
+  .d-head{display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:34px}
+  .d-id{display:flex; align-items:center; gap:13px}
+  .d-mark{width:54px; height:48px; border-radius:11px; background:var(--dark); display:grid; place-items:center; padding:9px 11px}
+  .d-mark img{width:100%; display:block}
+  .d-id h1{font-size:20px; font-weight:700; letter-spacing:.02em; line-height:1.1}
+  .d-id h1 span{color:var(--gold-deep)}
+  .d-id .sub{font-size:11px; color:var(--ink-mute); letter-spacing:.04em; margin-top:2px}
+  .d-title{text-align:right}
+  .d-title .big{font-family:"Bricolage Grotesque",sans-serif; font-size:42px; letter-spacing:-.02em; line-height:.9; color:var(--ink)}
+  .d-title .meta{margin-top:10px; font-size:12px; color:var(--ink-soft); line-height:1.7}
+  .d-title .meta b{color:var(--ink); font-weight:600}
+
+  .d-parties{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:30px}
+  .pcard{border:1px solid var(--line); border-radius:12px; padding:15px 17px}
+  .pcard.client{background:var(--bg-2)}
+  .pcard .plabel{font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-mute); font-weight:700; margin-bottom:8px}
+  .pcard .pname{font-size:15px; font-weight:600; margin-bottom:3px}
+  .pcard .pline{font-size:12.5px; color:var(--ink-soft); line-height:1.55}
+
+  table.d-table{width:100%; border-collapse:collapse; margin-bottom:6px}
+  table.d-table thead th{background:var(--dark); color:var(--on-dark); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:11px 14px; text-align:left}
+  table.d-table thead th.r{text-align:right}
+  table.d-table thead th:first-child{border-radius:8px 0 0 8px}
+  table.d-table thead th:last-child{border-radius:0 8px 8px 0}
+  table.d-table tbody td{padding:12px 14px; border-bottom:1px solid var(--line-soft); font-size:13px; vertical-align:top}
+  table.d-table tbody td.r{text-align:right; font-variant-numeric:tabular-nums}
+  table.d-table tbody tr td:first-child .desc{font-weight:600; color:var(--ink)}
+  table.d-table tbody tr td:first-child .note{font-size:11.5px; color:var(--ink-mute); margin-top:2px}
+
+  .d-bottom{display:flex; justify-content:space-between; gap:30px; margin-top:18px}
+  .d-notes{flex:1; max-width:360px}
+  .d-notes .plabel{font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-mute); font-weight:700; margin-bottom:7px}
+  .d-notes p{font-size:12px; color:var(--ink-soft); line-height:1.6; white-space:pre-wrap}
+  .d-tot{width:280px; flex:0 0 auto}
+  .d-tot .trow{display:flex; justify-content:space-between; font-size:13px; padding:7px 2px; color:var(--ink-soft)}
+  .d-tot .trow b{color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums}
+  .d-tot .grand{margin-top:6px; padding:14px 16px; background:var(--accent-ink); color:#fff; border-radius:11px; display:flex; justify-content:space-between; align-items:center}
+  .d-tot .grand span{font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.85}
+  .d-tot .grand b{font-family:"Bricolage Grotesque",sans-serif; font-size:23px; font-variant-numeric:tabular-nums}
+
+  .d-foot{margin-top:auto; padding-top:26px;
+  .d-foot{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; border-top:1px solid var(--line); margin-top:22px; padding-top:22px}
+  .d-pay{margin-top:30px}
+  .d-pay .plabel{font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-mute); font-weight:700; margin-bottom:9px}
+  .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .pay-card{border:1px solid var(--line); border-radius:12px; padding:13px 15px; background:var(--bg-2)}
+  .pay-card .pk{font-size:11px; font-weight:700; color:var(--accent-ink); letter-spacing:.03em; margin-bottom:5px}
+  .pay-card .pv{display:flex; flex-direction:column; gap:7px}
+  .pay-card .pv b{display:block; margin-bottom:2px}
+  .pay-card .pv b{font-size:13.5px; font-weight:600; color:var(--ink)}
+  .pay-card .pv span{font-size:12.5px; color:var(--ink-soft); font-family:"JetBrains Mono",monospace; letter-spacing:.02em}
+  .d-sign{font-size:11.5px; color:var(--ink-mute)}
+  .d-sign .line{margin-top:34px; width:180px; border-top:1px dashed var(--ink-mute); padding-top:5px}
+  .d-foot .contact{text-align:right; font-size:11px; color:var(--ink-mute); line-height:1.7}
+  .d-foot .contact b{color:var(--ink); font-weight:600}
+
+  .hint{font-size:11.5px; color:var(--ink-mute); margin-top:6px; line-height:1.5}
+
+  @media (max-width:900px){
+    .stage{grid-template-columns:1fr}
+    .editor{border-right:none; border-bottom:1px solid var(--line)}
+    .sheet, .sheet-wrap{width:100%; min-width:0}
+    .sheet{transform-origin:top left}
+  }
+
+  /* ---------- PRINT ---------- */
+  @media print{
+    @page{size:A4; margin:0}
+    html,body,.sheet,.preview-pane{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important}
+    .topbar, .editor{display:none !important}
+    .stage{display:block}
+    .preview-pane{padding:0; background:#fff; display:block; overflow:visible}
+    .sheet-wrap{width:auto}
+    .sheet{box-shadow:none; width:210mm; min-height:297mm; padding:16mm 15mm}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-mark"><img src="assets/logo-mark.png" alt="SD" /></span>
+    <span><b>SOUBA</b> <i>Digital</i></span>
+    <span class="tag">DEVISEUR</span>
+  </div>
+  <div class="actions">
+    <button class="btn" id="resetBtn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg>
+      Nouveau
+    </button>
+    <button class="btn gold" id="printBtn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V6h12v6h-2M5 9h6v5H5z"/></svg>
+      Imprimer / PDF
+    </button>
+  </div>
+</div>
+
+<div class="stage">
+  <!-- ===== EDITOR ===== -->
+  <div class="editor">
+
+    <div class="group">
+      <div class="glabel"><span class="num">1</span><span class="mono">Document</span></div>
+      <div class="two">
+        <div class="field"><label>N° de devis</label><input id="f_num" value="DV-2026-001" /></div>
+        <div class="field"><label>Objet</label><input id="f_objet" value="Création de site web" /></div>
+      </div>
+      <div class="two">
+        <div class="field"><label>Date d'émission</label><input id="f_date" type="date" /></div>
+        <div class="field"><label>Validité (jours)</label><input id="f_valid" type="number" value="30" /></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="glabel"><span class="num">2</span><span class="mono">Client</span></div>
+      <div class="field"><label>Nom / Société</label><input id="c_name" value="Nom du client" /></div>
+      <div class="field"><label>Contact</label><input id="c_contact" placeholder="Responsable, téléphone" /></div>
+      <div class="field"><label>Adresse</label><input id="c_addr" placeholder="Ville, Côte d'Ivoire" /></div>
+      <div class="field"><label>Email</label><input id="c_email" placeholder="client@email.com" /></div>
+    </div>
+
+    <div class="group">
+      <div class="glabel"><span class="num">3</span><span class="mono">Prestations</span></div>
+      <div class="items-head"><span>Désignation</span><span>Qté</span><span>P.U. (FCFA)</span><span></span></div>
+      <div id="items"></div>
+      <button class="btn add-item" id="addItem">+ Ajouter une ligne</button>
+
+      <div class="totbox">
+        <div class="totrow"><span>Remise (%)</span><span class="mini"><input id="f_remise" type="number" value="0" min="0" /></span></div>
+        <div class="totrow"><span>TVA (%)</span><span class="mini"><input id="f_tva" type="number" value="0" min="0" /></span></div>
+        <div class="totrow"><span>Acompte</span><span class="mini" style="flex:0 0 130px;width:130px"><select id="f_acc_mode"><option value="none">Aucun</option><option value="pct" selected>Pourcentage</option><option value="fix">Montant fixe</option></select></span></div>
+        <div class="totrow" id="row_acc_val"><span id="lbl_acc">Acompte (%)</span><span class="mini"><input id="f_acompte" type="number" value="50" min="0" /></span></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="glabel"><span class="num">4</span><span class="mono">Conditions &amp; notes</span></div>
+      <div class="field"><textarea id="f_notes">Devis valable 30 jours. Acompte de 50% à la commande, solde à la livraison. Délai de réalisation à convenir après validation.</textarea></div>
+      <div class="field"><label>Devise</label><input id="f_cur" value="FCFA" /></div>
+    </div>
+
+    <div class="group">
+      <div class="glabel"><span class="num">5</span><span class="mono">Modes de paiement</span></div>
+      <div class="field"><label>Mobile Money — opérateur</label><input id="f_mm_prov" placeholder="Orange Money / MTN / Moov / Wave" value="Wave" /></div>
+      <div class="field"><label>Mobile Money — numéro</label><input id="f_mm_num" placeholder="+225 ·· ·· ·· ·· ··" value="+33 7 83 52 05 33" /></div>
+      <div class="field"><label>Banque — établissement</label><input id="f_bk_prov" placeholder="Nom de la banque" value="DJAMO CI93" /></div>
+      <div class="field"><label>Banque — RIB / IBAN</label><input id="f_bk_rib" placeholder="CI···· ···· ···· ····" value="CI201 01001 111692114192 48" /></div>
+      <p class="hint">Tout est sauvegardé automatiquement dans ce navigateur. Utilisez « Imprimer / PDF » pour générer le devis final.</p>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW ===== -->
+  <div class="preview-pane">
+    <div class="sheet-wrap">
+      <div class="sheet" id="sheet">
+        <div class="topband"></div>
+
+        <div class="d-head">
+          <div class="d-id">
+            <span class="d-mark"><img src="assets/logo-mark.png" alt="SD" /></span>
+            <div>
+              <h1>SOUBA <span>DIGITAL</span></h1>
+              <div class="sub">Agence digitale · Gaming · SaaS · Abidjan</div>
+            </div>
+          </div>
+          <div class="d-title">
+            <div class="big">DEVIS</div>
+            <div class="meta">
+              N° <b id="p_num">DV-2026-001</b><br>
+              Émis le <b id="p_date">—</b><br>
+              Valable jusqu'au <b id="p_until">—</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-parties">
+          <div class="pcard">
+            <div class="plabel">Émetteur</div>
+            <div class="pname">SOUBA DIGITAL</div>
+            <div class="pline">Groupe entrepreneurial ivoirien<br>Abidjan · Côte d'Ivoire<br>contact@soubadigital.com</div>
+          </div>
+          <div class="pcard client">
+            <div class="plabel">Adressé à</div>
+            <div class="pname" id="p_cname">Nom du client</div>
+            <div class="pline" id="p_cinfo">—</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px"><span class="mono" style="color:var(--accent-ink); font-weight:600">Objet :</span> <span id="p_objet" style="font-weight:600">—</span></div>
+
+        <table class="d-table">
+          <thead>
+            <tr><th>Désignation</th><th class="r">Qté</th><th class="r">Prix unitaire</th><th class="r">Total</th></tr>
+          </thead>
+          <tbody id="p_rows"></tbody>
+        </table>
+
+        <div class="d-bottom">
+          <div class="d-notes">
+            <div class="plabel">Conditions</div>
+            <p id="p_notes">—</p>
+          </div>
+          <div class="d-tot">
+            <div class="trow"><span>Sous-total</span><b id="p_sub">0</b></div>
+            <div class="trow" id="p_remrow"><span>Remise</span><b id="p_rem">0</b></div>
+            <div class="trow" id="p_tvarow"><span>TVA</span><b id="p_tvaval">0</b></div>
+            <div class="grand"><span>Total TTC</span><b id="p_total">0 FCFA</b></div>
+            <div class="trow" id="p_accrow" style="margin-top:8px"><span>Acompte à verser</span><b id="p_acc">0</b></div>
+          </div>
+        </div>
+
+        <div class="d-pay" id="p_paywrap">
+          <div class="plabel">Modalités de règlement</div>
+          <div class="pay-grid">
+            <div class="pay-card" id="p_mm_card">
+              <div class="pk">Mobile Money</div>
+              <div class="pv"><b id="p_mm_prov">—</b><span id="p_mm_num"></span></div>
+            </div>
+            <div class="pay-card" id="p_bk_card">
+              <div class="pk">Virement bancaire</div>
+              <div class="pv"><b id="p_bk_prov">—</b><span id="p_bk_rib"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-foot">
+          <div class="d-sign">
+            Bon pour accord — signature du client
+            <div class="line">Date &amp; signature</div>
+          </div>
+          <div class="contact" style="display:none">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'souba_deviseur_v1';
+const $ = id => document.getElementById(id);
+const fmt = n => (Math.round(n)||0).toLocaleString('fr-FR');
+
+let items = [];
+
+function defaultItems(){
+  return [
+    {desc:'Conception & design UI/UX', note:'Maquettes, charte, responsive', qty:1, pu:250000},
+    {desc:'Développement du site', note:'Intégration & mise en ligne', qty:1, pu:400000},
+    {desc:'Hébergement & nom de domaine', note:'1 an', qty:1, pu:75000},
+  ];
+}
+
+/* ---- editor rows ---- */
+function renderItems(){
+  const box = $('items'); box.innerHTML='';
+  items.forEach((it,i)=>{
+    const row = document.createElement('div'); row.className='lirow';
+    row.innerHTML =
+      `<div style="display:flex;flex-direction:column;gap:6px">
+         <input data-k="desc" data-i="${i}" value="${esc(it.desc)}" placeholder="Désignation" />
+         <input data-k="note" data-i="${i}" value="${esc(it.note||'')}" placeholder="Détail (optionnel)" style="font-size:12px;color:var(--ink-soft)" />
+       </div>
+       <input data-k="qty" data-i="${i}" type="number" min="0" value="${it.qty}" />
+       <input data-k="pu" data-i="${i}" type="number" min="0" value="${it.pu}" />
+       <button class="del" data-del="${i}" title="Supprimer">✕</button>`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input',e=>{
+      const i=+e.target.dataset.i, k=e.target.dataset.k;
+      items[i][k] = (k==='qty'||k==='pu') ? (parseFloat(e.target.value)||0) : e.target.value;
+      update();
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click',e=>{ items.splice(+e.target.dataset.del,1); renderItems(); update(); });
+  });
+}
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+/* ---- compute + render preview ---- */
+function update(){
+  const cur = $('f_cur').value || 'FCFA';
+  const sub = items.reduce((s,it)=>s+ (it.qty*it.pu),0);
+  const rem = sub * (parseFloat($('f_remise').value)||0)/100;
+  const base = sub - rem;
+  const tva = base * (parseFloat($('f_tva').value)||0)/100;
+  const total = base + tva;
+  const accMode = $('f_acc_mode').value;
+  let acc = 0;
+  if(accMode==='pct') acc = total * (parseFloat($('f_acompte').value)||0)/100;
+  else if(accMode==='fix') acc = parseFloat($('f_acompte').value)||0;
+  $('row_acc_val').style.display = accMode==='none' ? 'none':'flex';
+  $('lbl_acc').textContent = accMode==='fix' ? 'Montant ('+cur+')' : 'Acompte (%)';
+
+  // header
+  $('p_num').textContent = $('f_num').value;
+  $('p_objet').textContent = $('f_objet').value || '—';
+  const d = $('f_date').value ? new Date($('f_date').value) : new Date();
+  const opt = {day:'2-digit',month:'long',year:'numeric'};
+  $('p_date').textContent = d.toLocaleDateString('fr-FR',opt);
+  const until = new Date(d); until.setDate(until.getDate()+(parseInt($('f_valid').value)||0));
+  $('p_until').textContent = until.toLocaleDateString('fr-FR',opt);
+
+  // client
+  $('p_cname').textContent = $('c_name').value || '—';
+  const ci = [$('c_contact').value,$('c_addr').value,$('c_email').value].filter(Boolean).join('<br>');
+  $('p_cinfo').innerHTML = ci || '—';
+
+  // rows
+  $('p_rows').innerHTML = items.map(it=>
+    `<tr>
+       <td><div class="desc">${esc(it.desc)||'—'}</div>${it.note?`<div class="note">${esc(it.note)}</div>`:''}</td>
+       <td class="r">${it.qty}</td>
+       <td class="r">${fmt(it.pu)}</td>
+       <td class="r"><b>${fmt(it.qty*it.pu)}</b></td>
+     </tr>`).join('') || `<tr><td colspan="4" style="color:var(--ink-mute);padding:20px 14px">Aucune prestation</td></tr>`;
+
+  // totals
+  $('p_sub').textContent = fmt(sub)+' '+cur;
+  $('p_remrow').style.display = rem>0 ? 'flex':'none';
+  $('p_rem').textContent = '− '+fmt(rem)+' '+cur;
+  $('p_tvarow').style.display = tva>0 ? 'flex':'none';
+  $('p_tvaval').textContent = fmt(tva)+' '+cur;
+  $('p_total').textContent = fmt(total)+' '+cur;
+  $('p_accrow').style.display = acc>0 ? 'flex':'none';
+  $('p_acc').textContent = fmt(acc)+' '+cur;
+
+  // notes
+  $('p_notes').textContent = $('f_notes').value || '—';
+
+  // payment methods
+  const mmP = $('f_mm_prov').value.trim(), mmN = $('f_mm_num').value.trim();
+  const bkP = $('f_bk_prov').value.trim(), bkR = $('f_bk_rib').value.trim();
+  const hasMM = mmP || mmN, hasBK = bkP || bkR;
+  $('p_mm_card').style.display = hasMM ? 'block':'none';
+  $('p_bk_card').style.display = hasBK ? 'block':'none';
+  $('p_paywrap').style.display = (hasMM||hasBK) ? 'block':'none';
+  $('p_mm_prov').textContent = mmP || 'Mobile Money';
+  $('p_mm_num').textContent = mmN;
+  $('p_bk_prov').textContent = bkP || 'Banque';
+  $('p_bk_rib').textContent = bkR;
+
+  save();
+}
+
+/* ---- persistence ---- */
+function save(){
+  const data = {items};
+  document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el=>{ if(el.id) data[el.id]=el.value; });
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+function load(){
+  let data=null;
+  try{ data = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
+  if(data){
+    items = data.items || defaultItems();
+    Object.keys(data).forEach(k=>{ if(k!=='items' && $(k)) $(k).value=data[k]; });
+  }else{
+    items = defaultItems();
+    $('f_date').value = new Date().toISOString().slice(0,10);
+  }
+  if(!$('f_date').value) $('f_date').value = new Date().toISOString().slice(0,10);
+}
+
+/* ---- wire ---- */
+document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el=>{
+  if(el.closest('#items')) return;
+  el.addEventListener('input',update);
+});
+$('addItem').addEventListener('click',()=>{ items.push({desc:'',note:'',qty:1,pu:0}); renderItems(); update(); });
+$('printBtn').addEventListener('click',()=>window.print());
+$('resetBtn').addEventListener('click',()=>{
+  if(confirm('Créer un nouveau devis vierge ? Le devis actuel sera effacé.')){
+    localStorage.removeItem(KEY);
+    items = defaultItems();
+    document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el=>{
+      if(el.id && el.id!=='f_date') el.defaultValue!==undefined && (el.value=el.defaultValue);
+    });
+    location.reload();
+  }
+});
+
+load();
+renderItems();
+update();
+</script>
+</body>
+</html>

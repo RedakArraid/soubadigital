@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — SOUBA DIGITAL</title>
+<link rel="icon" type="image/png" href="/assets/logo-mark.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: oklch(0.995 0.004 235);
+    --bg-2: oklch(0.972 0.012 235);
+    --bg-3: oklch(0.955 0.022 235);
+    --ink: oklch(0.26 0.030 250);
+    --ink-soft: oklch(0.46 0.022 245);
+    --ink-mute: oklch(0.62 0.018 240);
+    --line: oklch(0.90 0.018 235);
+    --line-soft: oklch(0.95 0.014 235);
+    --accent-ink: oklch(0.52 0.110 240);
+    --accent-soft: oklch(0.94 0.040 235);
+    --dark: oklch(0.32 0.040 250);
+    --on-dark: oklch(0.98 0.008 235);
+    --danger: #c0392b;
+    --sidebar-w: 240px;
+    --r-md: 12px;
+    --r-sm: 8px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:"Geist",system-ui,sans-serif;background:var(--bg-2);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button,input,textarea,select{font-family:inherit}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute)}
+
+  /* Login */
+  .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+  .login-card{width:min(420px,100%);background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:36px 32px;box-shadow:0 24px 60px -32px rgba(20,30,60,.2)}
+  .login-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+  .login-brand img{width:40px;height:auto}
+  .login-brand b{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;letter-spacing:-.02em}
+  .login-brand span{display:block;font-size:12px;color:var(--ink-mute);margin-top:2px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:6px}
+  .field input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:14px;background:var(--bg)}
+  .field input:focus{outline:none;border-color:var(--accent-ink);box-shadow:0 0 0 3px var(--accent-soft)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:14px;font-weight:500;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--ink-mute)}
+  .btn.primary{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--on-dark);width:100%}
+  .btn.primary:hover{background:var(--ink)}
+  .btn.danger{color:var(--danger);border-color:#e0b4ae}
+  .btn.sm{padding:8px 14px;font-size:13px}
+  .error-msg{color:var(--danger);font-size:13px;margin-top:10px;min-height:18px}
+
+  /* App shell */
+  .app{display:none;min-height:100vh}
+  .app.ready{display:grid;grid-template-columns:var(--sidebar-w) 1fr}
+  .sidebar{background:var(--dark);color:var(--on-dark);padding:24px 16px;display:flex;flex-direction:column;gap:8px;position:sticky;top:0;height:100vh}
+  .sidebar-brand{padding:4px 12px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid color-mix(in oklab,var(--on-dark) 12%,transparent);margin-bottom:8px}
+  .sidebar-brand img{width:32px}
+  .sidebar-brand b{font-family:"Bricolage Grotesque",sans-serif;font-size:16px}
+  .sidebar-brand small{display:block;font-size:11px;opacity:.55;margin-top:2px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--r-sm);font-size:14px;color:color-mix(in oklab,var(--on-dark) 75%,transparent);cursor:pointer;border:none;background:transparent;width:100%;text-align:left}
+  .nav-item:hover{background:color-mix(in oklab,var(--on-dark) 8%,transparent);color:var(--on-dark)}
+  .nav-item.active{background:color-mix(in oklab,var(--accent-ink) 35%,transparent);color:#fff;font-weight:500}
+  .nav-item svg{width:18px;height:18px;opacity:.8;flex-shrink:0}
+  .sidebar-foot{margin-top:auto;padding:12px;border-top:1px solid color-mix(in oklab,var(--on-dark) 12%,transparent)}
+  .sidebar-foot .user{font-size:12px;opacity:.7;margin-bottom:10px;padding:0 4px}
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{height:60px;border-bottom:1px solid var(--line);background:color-mix(in oklab,var(--bg) 92%,transparent);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+  .topbar h1{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0}
+  .content{flex:1;padding:28px;overflow:auto}
+  .panel{display:none}
+  .panel.active{display:block}
+  .panel iframe{width:100%;height:calc(100vh - 60px);border:0;display:block;margin:-28px;width:calc(100% + 56px)}
+
+  /* Config */
+  .section{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-md);padding:22px;margin-bottom:20px}
+  .section h2{font-family:"Bricolage Grotesque",sans-serif;font-size:18px;font-weight:600;margin:0 0 4px}
+  .section .sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .logo-list{display:flex;flex-direction:column;gap:12px}
+  .logo-card{display:grid;grid-template-columns:80px 1fr auto;gap:14px;align-items:start;padding:14px;border:1px solid var(--line-soft);border-radius:var(--r-sm);background:var(--bg-2)}
+  .logo-thumb{width:80px;height:54px;border-radius:8px;border:1px solid var(--line);background:var(--bg);display:grid;place-items:center;overflow:hidden}
+  .logo-thumb img{max-width:90%;max-height:90%;object-fit:contain}
+  .logo-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .logo-fields .field{margin:0}
+  .logo-fields .span2{grid-column:span 2}
+  .checks{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+  .checks label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft)}
+  .social-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px;align-items:end;margin-bottom:10px}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:var(--on-dark);padding:12px 18px;border-radius:999px;font-size:13px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1;transform:none}
+  .actions-bar{display:flex;gap:10px;margin-top:20px}
+  @media(max-width:900px){
+    .app.ready{grid-template-columns:1fr}
+    .sidebar{height:auto;position:relative}
+    .grid-2,.logo-fields{grid-template-columns:1fr}
+    .logo-card{grid-template-columns:1fr}
+    .social-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+  <form class="login-card" id="loginForm">
+    <div class="login-brand">
+      <img src="/assets/logo-mark.png" alt="" />
+      <div>
+        <b>SOUBA Digital</b>
+        <span>Espace administration</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Identifiant</label>
+      <input name="username" autocomplete="username" required />
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input name="password" type="password" autocomplete="current-password" required />
+    </div>
+    <button class="btn primary" type="submit">Se connecter</button>
+    <div class="error-msg" id="loginError"></div>
+  </form>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/assets/logo-mark.png" alt="" />
+      <div>
+        <b>SOUBA</b>
+        <small>Administration</small>
+      </div>
+    </div>
+    <button class="nav-item active" data-panel="deviseur">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      Deviseur
+    </button>
+    <button class="nav-item" data-panel="config">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      Configuration
+    </button>
+    <div class="sidebar-foot">
+      <div class="user" id="userLabel">—</div>
+      <button class="btn sm" id="logoutBtn" style="width:100%;background:transparent;border-color:color-mix(in oklab,var(--on-dark) 20%,transparent);color:var(--on-dark)">Déconnexion</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">Deviseur</h1>
+      <a class="btn sm" href="https://soubadigital.com" target="_blank" rel="noopener">Voir le site ↗</a>
+    </header>
+
+    <div class="content">
+      <section class="panel active" id="panel-deviseur">
+        <iframe src="/admin/deviseur.html" title="Deviseur"></iframe>
+      </section>
+
+      <section class="panel" id="panel-config">
+        <div class="section">
+          <h2>Contact</h2>
+          <p class="sub">Numéro affiché sur la vitrine (section contact).</p>
+          <div class="grid-2">
+            <div class="field">
+              <label>Téléphone affiché</label>
+              <input id="cfgPhone" placeholder="+225 07 15 29 63 84" />
+            </div>
+            <div class="field">
+              <label>Lien tel: (sans espaces)</label>
+              <input id="cfgPhoneTel" placeholder="+2250715296384" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Réseaux sociaux</h2>
+          <p class="sub">Icônes affichées en bas de page sur la vitrine. Laissez vide pour masquer.</p>
+          <div id="socialList"></div>
+        </div>
+
+        <div class="section">
+          <h2>Ils nous font confiance</h2>
+          <p class="sub">Logos partenaires avec liens optionnels vers leurs sites.</p>
+          <div class="logo-list" id="logoList"></div>
+          <button class="btn sm" type="button" id="addLogoBtn" style="margin-top:14px">+ Ajouter un logo</button>
+        </div>
+
+        <div class="actions-bar">
+          <button class="btn primary" type="button" id="saveConfigBtn">Enregistrer</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Enregistré</div>
+
+<script>
+const TOKEN_KEY = 'souba_admin_token';
+const USER_KEY = 'souba_admin_user';
+
+let config = null;
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function token() { return localStorage.getItem(TOKEN_KEY); }
+
+async function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  if (opts.body && !(opts.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(opts.body);
+  }
+  if (token()) headers.Authorization = `Bearer ${token()}`;
+  const res = await fetch(path, { ...opts, headers });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+  return data;
+}
+
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function showApp() {
+  $('#loginView').style.display = 'none';
+  $('#app').classList.add('ready');
+  $('#userLabel').textContent = localStorage.getItem(USER_KEY) || 'admin';
+}
+
+function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  location.reload();
+}
+
+$('#loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('#loginError').textContent = '';
+  const fd = new FormData(e.target);
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: { username: fd.get('username'), password: fd.get('password') }
+    });
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, data.user);
+    showApp();
+    await loadConfig();
+  } catch (err) {
+    $('#loginError').textContent = err.message;
+  }
+});
+
+$('#logoutBtn').addEventListener('click', logout);
+
+$$('.nav-item').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    $$('.nav-item').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    const id = btn.dataset.panel;
+    $$('.panel').forEach((p) => p.classList.remove('active'));
+    $(`#panel-${id}`).classList.add('active');
+    $('#pageTitle').textContent = id === 'deviseur' ? 'Deviseur' : 'Configuration';
+  });
+});
+
+const SOCIAL_LABELS = {
+  linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  x: 'X (Twitter)'
+};
+
+function renderSocial() {
+  const box = $('#socialList');
+  box.innerHTML = '';
+  (config.social || []).forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'social-row';
+    row.innerHTML = `
+      <div class="field">
+        <label>Réseau</label>
+        <input value="${esc(s.label || SOCIAL_LABELS[s.platform] || s.platform)}" data-i="${i}" data-k="label" />
+      </div>
+      <div class="field">
+        <label>URL</label>
+        <input value="${esc(s.url || '')}" placeholder="https://..." data-i="${i}" data-k="url" />
+      </div>
+      <span class="mono" style="padding-bottom:10px">${esc(s.platform)}</span>`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll('input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const i = +e.target.dataset.i;
+      const k = e.target.dataset.k;
+      config.social[i][k] = e.target.value;
+    });
+  });
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function renderLogos() {
+  const box = $('#logoList');
+  box.innerHTML = '';
+  (config.clientLogos || []).forEach((logo, i) => {
+    const card = document.createElement('div');
+    card.className = 'logo-card';
+    card.innerHTML = `
+      <div class="logo-thumb">${logo.imageUrl ? `<img src="${esc(logo.imageUrl)}" alt="" />` : '<span class="mono">—</span>'}</div>
+      <div class="logo-fields">
+        <div class="field"><label>Nom</label><input value="${esc(logo.name)}" data-i="${i}" data-k="name" /></div>
+        <div class="field"><label>Lien URL</label><input value="${esc(logo.linkUrl || '')}" placeholder="https://..." data-i="${i}" data-k="linkUrl" /></div>
+        <div class="field span2"><label>Image (URL)</label><input value="${esc(logo.imageUrl || '')}" data-i="${i}" data-k="imageUrl" /></div>
+        <div class="checks span2">
+          <label><input type="checkbox" data-i="${i}" data-k="fullLogo" ${logo.fullLogo ? 'checked' : ''} /> Logo complet</label>
+          <label><input type="checkbox" data-i="${i}" data-k="darkBg" ${logo.darkBg ? 'checked' : ''} /> Fond sombre</label>
+        </div>
+        <div class="field span2">
+          <label>Uploader une image</label>
+          <input type="file" accept="image/*" data-upload="${i}" />
+        </div>
+      </div>
+      <button class="btn sm danger" type="button" data-del="${i}">Supprimer</button>`;
+    box.appendChild(card);
+  });
+
+  box.querySelectorAll('input[data-k]').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      config.clientLogos[+e.target.dataset.i][e.target.dataset.k] = e.target.value;
+      if (e.target.dataset.k === 'imageUrl') renderLogos();
+    });
+  });
+  box.querySelectorAll('input[type=checkbox]').forEach((cb) => {
+    cb.addEventListener('change', (e) => {
+      config.clientLogos[+e.target.dataset.i][e.target.dataset.k] = e.target.checked;
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      config.clientLogos.splice(+btn.dataset.del, 1);
+      renderLogos();
+    });
+  });
+  box.querySelectorAll('[data-upload]').forEach((inp) => {
+    inp.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const i = +e.target.dataset.upload;
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const data = await api('/api/admin/upload', { method: 'POST', body: fd });
+        config.clientLogos[i].imageUrl = data.url;
+        renderLogos();
+        toast('Image uploadée');
+      } catch (err) {
+        alert(err.message);
+      }
+      e.target.value = '';
+    });
+  });
+}
+
+async function loadConfig() {
+  config = await api('/api/admin/config');
+  $('#cfgPhone').value = config.phone || '';
+  $('#cfgPhoneTel').value = config.phoneTel || '';
+  renderSocial();
+  renderLogos();
+}
+
+$('#cfgPhone').addEventListener('input', (e) => { config.phone = e.target.value; });
+$('#cfgPhoneTel').addEventListener('input', (e) => { config.phoneTel = e.target.value; });
+
+$('#addLogoBtn').addEventListener('click', () => {
+  config.clientLogos.push({
+    id: `logo-${Date.now()}`,
+    name: 'Nouveau partenaire',
+    imageUrl: '',
+    linkUrl: '',
+    fullLogo: true,
+    darkBg: false
+  });
+  renderLogos();
+});
+
+$('#saveConfigBtn').addEventListener('click', async () => {
+  config.phone = $('#cfgPhone').value;
+  config.phoneTel = $('#cfgPhoneTel').value;
+  try {
+    config = await api('/api/admin/config', { method: 'PUT', body: config });
+    toast('Configuration enregistrée');
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+if (token()) {
+  showApp();
+  loadConfig().catch(logout);
+}
+</script>
+</body>
+</html>

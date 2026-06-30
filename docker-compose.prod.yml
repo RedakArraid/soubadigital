@@ -20,6 +20,35 @@ services:
       timeout: 5s
       retries: 3
 
+  admin:
+    build: ./server
+    container_name: soubadigital-admin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - ADMIN_DIR=/app/admin
+      - ASSETS_DIR=/app/assets
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      - ./admin:/app/admin:ro
+      - ./assets:/app/assets:ro
+    networks:
+      - traefik_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.soubadigital-admin.rule=Host(`admin.soubadigital.com`)
+      - traefik.http.routers.soubadigital-admin.entrypoints=websecure
+      - traefik.http.routers.soubadigital-admin.tls=true
+      - traefik.http.routers.soubadigital-admin.tls.certresolver=mytlschallenge
+      - traefik.http.services.soubadigital-admin.loadbalancer.server.port=3000
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 networks:
   traefik_network:
     external: true

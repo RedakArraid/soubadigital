@@ -1,3 +1,9 @@
 # Fichiers dupliqués à la racine (vrais assets dans assets/)
 /logo-mark.png
 /souba-logo.png
+
+# Données admin (SQLite + uploads)
+/data/
+.env
+server/node_modules/
+SOUBA DIGITAL.zip
