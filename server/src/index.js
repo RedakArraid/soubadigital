@@ -4,7 +4,7 @@ import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { authMiddleware, signToken } from './auth.js';
+import { authMiddleware, authCookieHeader, clearAuthCookieHeader, pageAuthMiddleware, signToken } from './auth.js';
 import {
   DATA_DIR,
   UPLOADS_DIR,
@@ -75,7 +75,13 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   const token = signToken({ sub: username });
+  res.setHeader('Set-Cookie', authCookieHeader(token));
   res.json({ token, user: username });
+});
+
+app.post('/api/auth/logout', (_req, res) => {
+  res.setHeader('Set-Cookie', clearAuthCookieHeader());
+  res.json({ ok: true });
 });
 
 app.get('/api/admin/config', authMiddleware, (_req, res) => {
@@ -109,6 +115,10 @@ if (fs.existsSync(ASSETS_DIR)) {
 }
 
 if (fs.existsSync(ADMIN_DIR)) {
+  app.get('/admin/deviseur.html', pageAuthMiddleware, (_req, res) => {
+    res.sendFile(path.join(ADMIN_DIR, 'deviseur.html'));
+  });
+
   app.use('/admin', express.static(ADMIN_DIR, { index: 'index.html' }));
   app.get('/admin/*', (_req, res) => {
     res.sendFile(path.join(ADMIN_DIR, 'index.html'));
