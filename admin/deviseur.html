@@ -175,23 +175,24 @@
     .sheet{transform-origin:top left}
   }
 
-  /* ---------- PRINT (spec maquette zip — WYSIWYG A4) ---------- */
+  /* ---------- PRINT : mêmes dimensions que l’aperçu (#sheet 794×1123) ---------- */
   @media print{
     @page{size:A4 portrait; margin:0}
     *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important}
-    html,body{width:210mm; margin:0 !important; padding:0 !important; background:#fff !important; overflow:visible !important}
+    html,body{margin:0 !important; padding:0 !important; background:#fff !important; overflow:visible !important}
     .topbar, .editor{display:none !important}
-    .stage{display:block !important; min-height:auto !important}
+    .stage{display:block !important; min-height:auto !important; width:auto !important}
     .preview-pane{
       padding:0 !important; margin:0 !important;
       background:#fff !important; overflow:visible !important;
       display:block !important;
     }
-    .sheet-wrap{width:210mm !important; margin:0 !important}
+    .sheet-wrap{width:794px !important; margin:0 auto !important}
     .sheet{
       box-shadow:none !important;
-      width:210mm !important; min-height:297mm !important;
-      padding:14mm 14mm 12mm !important;
+      width:794px !important;
+      min-height:1123px !important;
+      padding:54px 54px 46px !important;
       margin:0 !important;
       break-inside:avoid; page-break-inside:avoid;
     }
@@ -501,13 +502,58 @@ document.querySelectorAll('.editor input, .editor textarea, .editor select').for
   el.addEventListener('input',update);
 });
 $('addItem').addEventListener('click',()=>{ items.push({desc:'',note:'',qty:1,pu:0}); renderItems(); update(); });
-$('printBtn').addEventListener('click', () => {
-  if (window.self !== window.top) {
-    window.open('/admin/deviseur.html', '_blank');
+$('printBtn').addEventListener('click', printDevis);
+
+function printDevis(){
+  const wrap = document.querySelector('.sheet-wrap');
+  if(!wrap){ window.print(); return; }
+
+  const headAssets = [...document.querySelectorAll('link[rel="stylesheet"], link[rel="preconnect"], link[rel="icon"]')]
+    .map(el => el.outerHTML).join('\n');
+  const inlineStyles = [...document.querySelectorAll('style')].map(el => el.outerHTML).join('\n');
+
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<title>Devis — SOUBA DIGITAL</title>
+${headAssets}
+${inlineStyles}
+<style>
+  html,body{margin:0;padding:0;background:#fff}
+  body{display:flex;justify-content:center;align-items:flex-start}
+  .preview-pane{padding:0;background:#fff;display:block}
+  .sheet-wrap{width:794px;margin:0}
+  .sheet{box-shadow:none!important;width:794px!important;min-height:1123px!important;padding:54px 54px 46px!important}
+  @page{size:A4 portrait;margin:0}
+  @media print{
+    html,body{background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{display:block!important}
+    .sheet-wrap{margin:0 auto!important}
+    .sheet{width:794px!important;min-height:1123px!important;padding:54px 54px 46px!important;box-shadow:none!important}
+  }
+</style></head><body>
+<div class="preview-pane">${wrap.outerHTML}</div>
+<script>
+  function runPrint(){
+    window.focus();
+    window.print();
+  }
+  window.addEventListener('afterprint', () => window.close());
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => setTimeout(runPrint, 350));
+  } else {
+    setTimeout(runPrint, 600);
+  }
+<\/script></body></html>`;
+
+  const win = window.open('', '_blank', 'noopener,noreferrer,width=860,height=1180');
+  if(!win){
+    alert('Autorisez les fenêtres pop-up pour imprimer le devis tel qu\\'affiché.');
+    window.print();
     return;
   }
-  window.print();
-});
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
 $('resetBtn').addEventListener('click',()=>{
   if(confirm('Créer un nouveau devis vierge ? Le devis actuel sera effacé.')){
     localStorage.removeItem(KEY);
