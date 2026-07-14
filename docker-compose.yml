@@ -1,10 +1,13 @@
 services:
   web:
-    image: nginx:alpine
+    build: ./web
     ports:
-      - "8090:80"
-    volumes:
-      - ./:/usr/share/nginx/html:ro
+      - "8090:3000"
+    environment:
+      - API_BASE_INTERNAL=http://admin:3000
+      - NEXT_PUBLIC_API_BASE=http://localhost:8091
+    depends_on:
+      - admin
     restart: unless-stopped
 
   admin:
