@@ -91,13 +91,25 @@
   .social-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px;align-items:end;margin-bottom:10px}
   .toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:var(--on-dark);padding:12px 18px;border-radius:999px;font-size:13px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:100}
   .toast.show{opacity:1;transform:none}
-  .actions-bar{display:flex;gap:10px;margin-top:20px}
+  .actions-bar{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .doc-table{width:100%;border-collapse:collapse;font-size:14px}
+  .doc-table th,.doc-table td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  .doc-table th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);font-weight:600}
+  .doc-table tr:hover td{background:var(--bg-2)}
+  .doc-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .doc-empty{padding:28px;text-align:center;color:var(--ink-mute);border:1px dashed var(--line);border-radius:var(--r-md)}
+  .upload-zone{
+    border:1px dashed var(--line);border-radius:var(--r-md);padding:22px;background:var(--bg-2);
+    display:flex;flex-direction:column;gap:12px;align-items:flex-start
+  }
+  .btn.primary.inline{width:auto}
   @media(max-width:900px){
     .app.ready{grid-template-columns:1fr}
     .sidebar{height:auto;position:relative}
     .grid-2,.logo-fields{grid-template-columns:1fr}
     .logo-card{grid-template-columns:1fr}
     .social-row{grid-template-columns:1fr}
+    .doc-table{display:block;overflow-x:auto}
   }
 </style>
 </head>
@@ -140,6 +152,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
       Deviseur
     </a>
+    <button class="nav-item" data-panel="documents">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 12h18M3 17h18"/><path d="M7 7v10M12 7v10"/></svg>
+      Documents
+    </button>
+    <a class="nav-item" href="/pdf/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+      Outils PDF
+    </a>
     <button class="nav-item active" data-panel="config">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Configuration
@@ -157,6 +177,29 @@
     </header>
 
     <div class="content">
+      <section class="panel" id="panel-documents">
+        <div class="section">
+          <h2>Documents</h2>
+          <p class="sub">Déposez, renommez et téléchargez vos fichiers. Pour fusionner, compresser ou convertir un PDF, utilisez <a href="/pdf/" target="_blank" rel="noopener" style="color:var(--accent-ink);text-decoration:underline">Outils PDF</a>.</p>
+          <div class="upload-zone">
+            <div class="field" style="margin:0;width:100%">
+              <label>Ajouter un fichier (PDF, images, Word… — max 50 Mo)</label>
+              <input type="file" id="docFile" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.txt,application/pdf,image/*" />
+            </div>
+            <div class="field" style="margin:0;width:min(420px,100%)">
+              <label>Note (optionnel)</label>
+              <input id="docNote" placeholder="Ex. contrat client, devis signé…" />
+            </div>
+            <button class="btn primary inline" type="button" id="docUploadBtn">Uploader</button>
+          </div>
+        </div>
+        <div class="section">
+          <h2>Bibliothèque</h2>
+          <p class="sub" id="docCount">—</p>
+          <div id="docList"></div>
+        </div>
+      </section>
+
       <section class="panel active" id="panel-config">
         <div class="section">
           <h2>Contact</h2>
@@ -287,14 +330,15 @@ $('#loginForm').addEventListener('submit', async (e) => {
 
 $('#logoutBtn').addEventListener('click', logout);
 
-$$('.nav-item').forEach((btn) => {
+$$('.nav-item[data-panel]').forEach((btn) => {
   btn.addEventListener('click', () => {
-    $$('.nav-item').forEach((b) => b.classList.remove('active'));
+    $$('.nav-item[data-panel]').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
     const id = btn.dataset.panel;
     $$('.panel').forEach((p) => p.classList.remove('active'));
     $(`#panel-${id}`).classList.add('active');
-    $('#pageTitle').textContent = id === 'config' ? 'Configuration' : 'Administration';
+    $('#pageTitle').textContent = id === 'config' ? 'Configuration' : id === 'documents' ? 'Documents' : 'Administration';
+    if (id === 'documents') loadDocuments().catch((e) => alert(e.message));
   });
 });
 
@@ -304,6 +348,130 @@ const SOCIAL_LABELS = {
   facebook: 'Facebook',
   x: 'X (Twitter)'
 };
+
+function formatBytes(n) {
+  if (!n && n !== 0) return '—';
+  if (n < 1024) return n + ' o';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' Ko';
+  return (n / (1024 * 1024)).toFixed(1) + ' Mo';
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+  } catch {
+    return iso;
+  }
+}
+
+async function loadDocuments() {
+  const docs = await api('/api/admin/documents');
+  const box = $('#docList');
+  $('#docCount').textContent = docs.length ? `${docs.length} document${docs.length > 1 ? 's' : ''}` : 'Aucun document pour le moment';
+  if (!docs.length) {
+    box.innerHTML = '<div class="doc-empty">Aucun fichier. Uploadez un document ci-dessus.</div>';
+    return;
+  }
+  box.innerHTML = `
+    <table class="doc-table">
+      <thead><tr><th>Nom</th><th>Taille</th><th>Modifié</th><th>Note</th><th></th></tr></thead>
+      <tbody>
+        ${docs.map((d) => `
+          <tr data-id="${esc(d.id)}">
+            <td><b>${esc(d.name)}</b></td>
+            <td>${formatBytes(d.size)}</td>
+            <td>${formatDate(d.updatedAt || d.createdAt)}</td>
+            <td>${esc(d.note || '—')}</td>
+            <td>
+              <div class="doc-actions">
+                <button class="btn sm" type="button" data-dl="${esc(d.id)}">Télécharger</button>
+                <a class="btn sm" href="/pdf/" target="_blank" rel="noopener">PDF tools</a>
+                <button class="btn sm" type="button" data-rename="${esc(d.id)}">Renommer</button>
+                <button class="btn sm danger" type="button" data-del-doc="${esc(d.id)}">Supprimer</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  box.querySelectorAll('[data-dl]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.dl;
+      const res = await fetch(`/api/admin/documents/${id}/download`, {
+        headers: { Authorization: `Bearer ${token()}` }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || 'Téléchargement impossible');
+        return;
+      }
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      const cd = res.headers.get('Content-Disposition') || '';
+      const m = cd.match(/filename="?([^"]+)"?/);
+      a.href = URL.createObjectURL(blob);
+      a.download = m?.[1] || 'document';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  });
+
+  box.querySelectorAll('[data-rename]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.rename;
+      const row = docs.find((d) => d.id === id);
+      const name = prompt('Nouveau nom', row?.name || '');
+      if (!name || !name.trim()) return;
+      try {
+        await api(`/api/admin/documents/${id}`, { method: 'PATCH', body: { name: name.trim() } });
+        toast('Document renommé');
+        await loadDocuments();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+  });
+
+  box.querySelectorAll('[data-del-doc]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Supprimer ce document définitivement ?')) return;
+      try {
+        await api(`/api/admin/documents/${btn.dataset.delDoc}`, { method: 'DELETE' });
+        toast('Document supprimé');
+        await loadDocuments();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+  });
+}
+
+$('#docUploadBtn').addEventListener('click', async () => {
+  const input = $('#docFile');
+  const file = input.files?.[0];
+  if (!file) {
+    alert('Choisissez un fichier');
+    return;
+  }
+  const fd = new FormData();
+  fd.append('file', file);
+  const note = $('#docNote').value.trim();
+  if (note) fd.append('note', note);
+  try {
+    await api('/api/admin/documents', { method: 'POST', body: fd });
+    input.value = '';
+    $('#docNote').value = '';
+    toast('Document uploadé');
+    $$('.nav-item[data-panel]').forEach((b) => b.classList.toggle('active', b.dataset.panel === 'documents'));
+    $$('.panel').forEach((p) => p.classList.remove('active'));
+    $('#panel-documents').classList.add('active');
+    $('#pageTitle').textContent = 'Documents';
+    await loadDocuments();
+  } catch (e) {
+    alert(e.message);
+  }
+});
 
 function renderSocial() {
   const box = $('#socialList');

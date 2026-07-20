@@ -41,16 +41,57 @@ services:
       - traefik_network
     labels:
       - traefik.enable=true
-      - traefik.http.routers.soubadigital-admin.rule=Host(`admin.soubadigital.com`)
+      - traefik.http.routers.soubadigital-admin.rule=Host(`admin.soubadigital.com`) && !PathPrefix(`/pdf`)
+      - traefik.http.routers.soubadigital-admin.priority=50
       - traefik.http.routers.soubadigital-admin.entrypoints=websecure
       - traefik.http.routers.soubadigital-admin.tls=true
       - traefik.http.routers.soubadigital-admin.tls.certresolver=mytlschallenge
       - traefik.http.services.soubadigital-admin.loadbalancer.server.port=3000
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    container_name: soubadigital-pdf
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SYSTEM_ROOTURIPATH: /pdf
+      SECURITY_ENABLELOGIN: "true"
+      SECURITY_INITIALLOGIN_USERNAME: ${STIRLING_USER:-admin}
+      SECURITY_INITIALLOGIN_PASSWORD: ${STIRLING_PASSWORD}
+      SYSTEM_DEFAULTLOCALE: fr-FR
+      SYSTEM_MAXFILESIZE: "100"
+      UI_APPNAME: SOUBA PDF
+      UI_HOMEDESCRIPTION: Outils PDF — SOUBA Digital
+      DISABLE_ADDITIONAL_FEATURES: "false"
+      METRICS_ENABLED: "false"
+    volumes:
+      - ./data/stirling/configs:/configs
+      - ./data/stirling/tessdata:/usr/share/tessdata
+      - ./data/stirling/logs:/logs
+      - ./data/stirling/pipeline:/pipeline
+      - ./data/stirling/customFiles:/customFiles
+    networks:
+      - traefik_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.soubadigital-pdf.rule=Host(`admin.soubadigital.com`) && PathPrefix(`/pdf`)
+      - traefik.http.routers.soubadigital-pdf.priority=100
+      - traefik.http.routers.soubadigital-pdf.entrypoints=websecure
+      - traefik.http.routers.soubadigital-pdf.tls=true
+      - traefik.http.routers.soubadigital-pdf.tls.certresolver=mytlschallenge
+      - traefik.http.services.soubadigital-pdf.loadbalancer.server.port=8080
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/pdf/api/v1/info/status | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
 
 networks:
   traefik_network:
