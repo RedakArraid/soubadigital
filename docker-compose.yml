@@ -27,7 +27,10 @@ services:
     restart: unless-stopped
 
   stirling-pdf:
-    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    build:
+      context: ./stirling
+      dockerfile: Dockerfile
+    image: soubadigital-stirling-pdf:local
     ports:
       - "8092:8080"
     env_file:

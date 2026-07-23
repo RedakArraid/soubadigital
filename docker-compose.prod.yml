@@ -69,7 +69,10 @@ services:
       retries: 3
 
   stirling-pdf:
-    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    build:
+      context: ./stirling
+      dockerfile: Dockerfile
+    image: soubadigital-stirling-pdf:local
     container_name: soubadigital-pdf
     restart: unless-stopped
     env_file:
