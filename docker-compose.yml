@@ -34,9 +34,11 @@ services:
       - .env
     environment:
       SYSTEM_ROOTURIPATH: /pdf
-      SECURITY_ENABLELOGIN: "true"
-      SECURITY_INITIALLOGIN_USERNAME: ${STIRLING_USER:-admin}
-      SECURITY_INITIALLOGIN_PASSWORD: ${STIRLING_PASSWORD}
+      SYSTEM_FRONTENDURL: http://localhost:8092/pdf
+      SECURITY_ENABLELOGIN: "false"
+      SECURITY_XFRAMEOPTIONS: SAMEORIGIN
+      STORAGE_ENABLED: "false"
+      STORAGE_SIGNING_ENABLED: "false"
       SYSTEM_DEFAULTLOCALE: fr-FR
       SYSTEM_MAXFILESIZE: "100"
       UI_APPNAME: SOUBA PDF
@@ -49,4 +51,5 @@ services:
       - ./data/stirling/logs:/logs
       - ./data/stirling/pipeline:/pipeline
       - ./data/stirling/customFiles:/customFiles
+      - ./data/stirling/storage:/storage
     restart: unless-stopped

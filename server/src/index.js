@@ -4,7 +4,7 @@ import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { authMiddleware, authCookieHeader, clearAuthCookieHeader, getAuthToken, pageAuthMiddleware, signToken } from './auth.js';
+import { authMiddleware, authCookieHeader, clearAuthCookieHeader, getAuthToken, forwardAuthHandler, signToken } from './auth.js';
 import {
   DATA_DIR,
   UPLOADS_DIR,
@@ -20,6 +20,8 @@ import {
   documentFilePath,
   getDocument,
   listDocuments,
+  readDevisPayload,
+  saveDevisDocument,
   updateDocument
 } from './documents.js';
 
@@ -98,6 +100,9 @@ app.post('/api/auth/sync-cookie', authMiddleware, (req, res) => {
   if (jwt) res.setHeader('Set-Cookie', authCookieHeader(jwt));
   res.json({ ok: true });
 });
+
+/** Traefik ForwardAuth — protège /pdf avec le cookie JWT admin Souba */
+app.get('/api/auth/forward', forwardAuthHandler);
 
 app.get('/api/admin/config', authMiddleware, (_req, res) => {
   res.json(getSiteConfig());
@@ -179,7 +184,46 @@ app.get('/api/admin/documents/:id/download', authMiddleware, (req, res) => {
   if (!doc) return res.status(404).json({ error: 'Document introuvable' });
   const filePath = documentFilePath(doc);
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Fichier manquant sur le disque' });
+  if (doc.kind === 'devis') {
+    return res.status(400).json({ error: 'Ouvrez ce devis dans le Deviseur pour le modifier ou l’imprimer' });
+  }
   res.download(filePath, doc.name);
+});
+
+app.get('/api/admin/devis/:id', authMiddleware, (req, res) => {
+  const doc = getDocument(req.params.id);
+  if (!doc || doc.kind !== 'devis') return res.status(404).json({ error: 'Devis introuvable' });
+  const payload = readDevisPayload(doc);
+  if (!payload) return res.status(404).json({ error: 'Données du devis manquantes' });
+  res.json({ document: doc, payload });
+});
+
+app.post('/api/admin/devis', authMiddleware, (req, res) => {
+  const payload = req.body?.payload;
+  if (!payload || typeof payload !== 'object') {
+    return res.status(400).json({ error: 'payload requis' });
+  }
+  const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+  const note = typeof req.body?.note === 'string' ? req.body.note : '';
+  const doc = saveDevisDocument({ name, note, payload });
+  res.status(201).json(doc);
+});
+
+app.put('/api/admin/devis/:id', authMiddleware, (req, res) => {
+  const payload = req.body?.payload;
+  if (!payload || typeof payload !== 'object') {
+    return res.status(400).json({ error: 'payload requis' });
+  }
+  const name = typeof req.body?.name === 'string' ? req.body.name.trim() : undefined;
+  const note = typeof req.body?.note === 'string' ? req.body.note : undefined;
+  const doc = saveDevisDocument({
+    id: req.params.id,
+    name: name || getDocument(req.params.id)?.name,
+    note,
+    payload
+  });
+  if (!doc) return res.status(404).json({ error: 'Devis introuvable' });
+  res.json(doc);
 });
 
 app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '7d' }));
@@ -189,10 +233,8 @@ if (fs.existsSync(ASSETS_DIR)) {
 }
 
 if (fs.existsSync(ADMIN_DIR)) {
-  app.get('/admin/deviseur.html', pageAuthMiddleware, (_req, res) => {
-    res.sendFile(path.join(ADMIN_DIR, 'deviseur.html'));
-  });
-
+  // Deviseur servi en statique (pas de redirect login) : l’iframe n’envoie pas le Bearer,
+  // seul le shell admin est protégé. Le fichier ne contient aucun secret serveur.
   app.use('/admin', express.static(ADMIN_DIR, { index: 'index.html' }));
   app.get('/admin/*', (_req, res) => {
     res.sendFile(path.join(ADMIN_DIR, 'index.html'));

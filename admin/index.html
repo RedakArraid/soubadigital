@@ -73,6 +73,37 @@
   .content{flex:1;padding:28px;overflow:auto}
   .panel{display:none}
   .panel.active{display:block}
+  .panel.pdf-panel.active{
+    display:flex;flex-direction:column;
+    flex:1;min-height:0;
+    height:calc(100vh - 60px);margin:-28px;padding:0;
+    width:calc(100% + 56px);max-width:none;
+  }
+  .pdf-tabs{display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--line);background:var(--bg);flex-shrink:0;z-index:2}
+  .pdf-tab-hint{margin:0;padding:8px 14px 0;font-size:12px;color:var(--ink-mute);background:var(--bg);flex-shrink:0}
+  .pdf-tab{appearance:none;border:1px solid transparent;border-bottom:none;border-radius:10px 10px 0 0;background:transparent;padding:10px 16px;font:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);cursor:pointer}
+  .pdf-tab:hover{color:var(--ink);background:var(--bg-2)}
+  .pdf-tab.active{color:var(--ink);background:var(--bg-2);border-color:var(--line);font-weight:600}
+  .pdf-workbench{flex:1;min-height:560px;display:grid;grid-template-columns:minmax(260px,320px) 1fr;min-height:0;background:var(--bg)}
+  .pdf-lib{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--bg)}
+  .pdf-lib-head{padding:14px 14px 10px;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+  .pdf-lib-head h3{margin:0 0 4px;font-family:"Bricolage Grotesque",sans-serif;font-size:16px;font-weight:600}
+  .pdf-lib-head p{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.4}
+  .pdf-lib-upload{padding:10px 14px;border-bottom:1px solid var(--line-soft);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+  .pdf-lib-upload input[type=file]{font-size:12px;width:100%}
+  .pdf-lib-list{flex:1;overflow:auto;padding:8px}
+  .pdf-lib-item{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--line-soft);border-radius:var(--r-sm);margin-bottom:8px;background:var(--bg-2)}
+  .pdf-lib-item b{font-size:13px;word-break:break-word}
+  .pdf-lib-item .meta{font-size:11px;color:var(--ink-mute)}
+  .pdf-lib-item .doc-actions{gap:6px}
+  .pdf-lib-empty{padding:18px 10px;text-align:center;color:var(--ink-mute);font-size:13px}
+  .pdf-tool-wrap{min-width:0;min-height:0;position:relative;background:var(--bg-2)}
+  .pdf-tool-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;display:none}
+  .pdf-tool-frame.active{display:block}
+  @media(max-width:900px){
+    .pdf-workbench{grid-template-columns:1fr;grid-template-rows:min(40vh,280px) 1fr}
+    .pdf-lib{border-right:none;border-bottom:1px solid var(--line)}
+  }
 
   /* Config */
   .section{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-md);padding:22px;margin-bottom:20px}
@@ -148,18 +179,14 @@
         <small>Administration</small>
       </div>
     </div>
-    <a class="nav-item" href="/admin/deviseur.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-      Deviseur
-    </a>
     <button class="nav-item" data-panel="documents">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 12h18M3 17h18"/><path d="M7 7v10M12 7v10"/></svg>
       Documents
     </button>
-    <a class="nav-item" href="/pdf/" target="_blank" rel="noopener">
+    <button class="nav-item" data-panel="pdf">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
       Outils PDF
-    </a>
+    </button>
     <button class="nav-item active" data-panel="config">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Configuration
@@ -180,7 +207,7 @@
       <section class="panel" id="panel-documents">
         <div class="section">
           <h2>Documents</h2>
-          <p class="sub">Déposez, renommez et téléchargez vos fichiers. Pour fusionner, compresser ou convertir un PDF, utilisez <a href="/pdf/" target="_blank" rel="noopener" style="color:var(--accent-ink);text-decoration:underline">Outils PDF</a>.</p>
+          <p class="sub">Même bibliothèque que dans <button type="button" class="linkish" data-goto-pdf="stirling" style="color:var(--accent-ink);text-decoration:underline;background:none;border:none;padding:0;font:inherit;cursor:pointer">Outils PDF → Fusion</button>. Uploadez ici ou là-bas : les fichiers sont partagés.</p>
           <div class="upload-zone">
             <div class="field" style="margin:0;width:100%">
               <label>Ajouter un fichier (PDF, images, Word… — max 50 Mo)</label>
@@ -197,6 +224,31 @@
           <h2>Bibliothèque</h2>
           <p class="sub" id="docCount">—</p>
           <div id="docList"></div>
+        </div>
+      </section>
+
+      <section class="panel pdf-panel" id="panel-pdf">
+        <div class="pdf-tabs" role="tablist">
+          <button type="button" class="pdf-tab active" data-pdf-tab="deviseur" role="tab" aria-selected="true">Deviseur</button>
+          <button type="button" class="pdf-tab" data-pdf-tab="stirling" role="tab" aria-selected="false">Fusion / outils</button>
+        </div>
+        <p class="pdf-tab-hint">Bibliothèque SOUBA à gauche. <strong>Deviseur</strong> = devis. <strong>Fusion / outils</strong> = Stirling. Pour l’éditeur de texte PDF, préférez <a href="/pdf/" target="_blank" rel="noopener" style="color:var(--accent-ink)">ouvrir Stirling en plein écran ↗</a> (plus fiable).</p>
+        <div class="pdf-workbench" id="pdfWorkbench">
+          <aside class="pdf-lib">
+            <div class="pdf-lib-head">
+              <h3>Bibliothèque</h3>
+              <p>Devis et PDF partagés avec Documents. Devis → onglet Deviseur. Fichiers → Fusion.</p>
+            </div>
+            <div class="pdf-lib-upload">
+              <input type="file" id="pdfLibFile" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.txt,application/pdf,image/*" />
+              <button class="btn primary sm" type="button" id="pdfLibUploadBtn" style="width:100%">Ajouter un fichier</button>
+            </div>
+            <div class="pdf-lib-list" id="pdfLibList"></div>
+          </aside>
+          <div class="pdf-tool-wrap">
+            <iframe class="pdf-tool-frame active" id="deviseurFrame" title="Deviseur SOUBA" src="/admin/deviseur.html?embed=1"></iframe>
+            <iframe class="pdf-tool-frame" id="pdfFrame" title="Stirling PDF" src="about:blank"></iframe>
+          </div>
         </div>
       </section>
 
@@ -285,11 +337,271 @@ function logout() {
 function redirectAfterLogin() {
   const params = new URLSearchParams(location.search);
   const target = params.get('redirect');
-  if (target && target.startsWith('/admin/')) {
+  if (target && target.startsWith('/') && !target.startsWith('//')) {
+    if (target.startsWith('/pdf')) {
+      showApp();
+      openPdfPanel('stirling', null, target.endsWith('/') ? target : target);
+      history.replaceState({}, '', '/admin/');
+      loadConfig().catch(() => {});
+      return true;
+    }
     location.replace(target);
     return true;
   }
   return false;
+}
+
+function openPdfPanel(tab = 'deviseur', devisId = null, stirlingPath = '/pdf/') {
+  $$('.nav-item[data-panel]').forEach((b) => b.classList.toggle('active', b.dataset.panel === 'pdf'));
+  $$('.panel').forEach((p) => p.classList.remove('active'));
+  $('#panel-pdf').classList.add('active');
+  $('#pageTitle').textContent = 'Outils PDF';
+  // Resync cookie avant Stirling : l’admin marche en Bearer, Stirling/iframe a besoin du cookie
+  if (tab === 'stirling' && token()) {
+    api('/api/auth/sync-cookie', { method: 'POST' }).catch(() => {});
+  }
+  switchPdfTab(tab, devisId, stirlingPath);
+  loadDocuments().catch(() => {});
+}
+
+function switchPdfTab(tab, devisId = null, stirlingPath = '/pdf/') {
+  const which = tab === 'stirling' ? 'stirling' : 'deviseur';
+  $$('.pdf-tab').forEach((btn) => {
+    const on = btn.dataset.pdfTab === which;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  const devis = $('#deviseurFrame');
+  const stirling = $('#pdfFrame');
+  if (!devis || !stirling) return;
+  devis.classList.toggle('active', which === 'deviseur');
+  stirling.classList.toggle('active', which === 'stirling');
+  if (which === 'deviseur') {
+    const base = '/admin/deviseur.html?embed=1';
+    const src = devisId ? `${base}&id=${encodeURIComponent(devisId)}` : base;
+    if (devisId || !devis.src.includes('deviseur.html')) {
+      devis.src = src;
+    }
+  }
+  if (which === 'stirling') {
+    const path = stirlingPath.startsWith('/pdf') ? stirlingPath : '/pdf/';
+    const load = () => {
+      if (stirling.dataset.currentSrc !== path) {
+        stirling.src = path;
+        stirling.dataset.currentSrc = path;
+      } else {
+        // force reload after cookie sync so session is fresh
+        try { stirling.contentWindow?.location?.reload(); } catch { /* cross-origin ok */ }
+      }
+    };
+    api('/api/auth/sync-cookie', { method: 'POST' }).then(load).catch(load);
+  }
+}
+
+function openDevis(id) {
+  openPdfPanel('deviseur', id);
+}
+
+async function fetchDocumentBlob(id) {
+  const res = await fetch(`/api/admin/documents/${id}/download`, {
+    headers: { Authorization: `Bearer ${token()}` }
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Téléchargement impossible');
+  }
+  const blob = await res.blob();
+  const cd = res.headers.get('Content-Disposition') || '';
+  const m = cd.match(/filename\*?=(?:UTF-8''|")?([^\";]+)/i);
+  const name = m ? decodeURIComponent(m[1].replace(/"/g, '')) : 'document.pdf';
+  return { blob, name };
+}
+
+function findStirlingFileInputs(root) {
+  const inputs = [];
+  const walk = (node) => {
+    if (!node) return;
+    if (node.nodeType === 1) {
+      if (node.matches?.('input[type="file"]')) inputs.push(node);
+      if (node.shadowRoot) walk(node.shadowRoot);
+      node.childNodes?.forEach(walk);
+    }
+  };
+  walk(root);
+  return inputs;
+}
+
+async function useDocumentInStirling(id, preferredName, stirlingPath = '/pdf/') {
+  openPdfPanel('stirling', null, stirlingPath);
+  const frame = $('#pdfFrame');
+  if (frame.dataset.currentSrc !== stirlingPath) {
+    frame.src = stirlingPath.startsWith('/pdf') ? stirlingPath : '/pdf/';
+    frame.dataset.currentSrc = frame.src;
+    await new Promise((resolve) => {
+      frame.addEventListener('load', resolve, { once: true });
+      setTimeout(resolve, 4000);
+    });
+  }
+  const { blob, name } = await fetchDocumentBlob(id);
+  const file = new File([blob], preferredName || name, { type: blob.type || 'application/pdf' });
+
+  let injected = false;
+  try {
+    const doc = frame.contentDocument;
+    const inputs = findStirlingFileInputs(doc);
+    const input = inputs.find((el) => !el.disabled) || inputs[0];
+    if (input) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      injected = true;
+    }
+  } catch {
+    injected = false;
+  }
+
+  if (injected) {
+    toast(`« ${file.name} » envoyé vers l’outil PDF`);
+    return;
+  }
+
+  // Fallback : téléchargement local pour dépôt manuel dans Stirling
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = file.name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Fichier téléchargé — déposez-le dans l’outil à droite');
+}
+
+async function uploadDocumentFile(file, note = '') {
+  const fd = new FormData();
+  fd.append('file', file);
+  if (note) fd.append('note', note);
+  await api('/api/admin/documents', { method: 'POST', body: fd });
+}
+
+async function loadDocuments() {
+  const docs = await api('/api/admin/documents');
+  const box = $('#docList');
+  const lib = $('#pdfLibList');
+  $('#docCount').textContent = docs.length ? `${docs.length} document${docs.length > 1 ? 's' : ''}` : 'Aucun document pour le moment';
+
+  if (box) {
+    if (!docs.length) {
+      box.innerHTML = '<div class="doc-empty">Aucun fichier. Uploadez un document ou enregistrez un devis depuis Outils PDF → Deviseur.</div>';
+    } else {
+      box.innerHTML = `
+        <table class="doc-table">
+          <thead><tr><th>Nom</th><th>Type</th><th>Modifié</th><th>Note</th><th></th></tr></thead>
+          <tbody>
+            ${docs.map((d) => {
+              const isDevis = d.kind === 'devis';
+              return `
+              <tr data-id="${esc(d.id)}">
+                <td><b>${esc(d.name)}</b></td>
+                <td>${isDevis ? '<span class="mono" style="color:var(--accent-ink)">Devis</span>' : 'Fichier'}</td>
+                <td>${formatDate(d.updatedAt || d.createdAt)}</td>
+                <td>${esc(d.note || '—')}</td>
+                <td>
+                  <div class="doc-actions">
+                    ${isDevis
+                      ? `<button class="btn sm primary" type="button" data-edit-devis="${esc(d.id)}">Modifier</button>`
+                      : `<button class="btn sm" type="button" data-dl="${esc(d.id)}">Télécharger</button>
+                         <button class="btn sm" type="button" data-use-pdf="${esc(d.id)}" data-name="${esc(d.name)}">Utiliser dans Fusion</button>`}
+                    <button class="btn sm" type="button" data-rename="${esc(d.id)}">Renommer</button>
+                    <button class="btn sm danger" type="button" data-del-doc="${esc(d.id)}">Supprimer</button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+    }
+  }
+
+  if (lib) {
+    if (!docs.length) {
+      lib.innerHTML = '<div class="pdf-lib-empty">Aucun document. Enregistrez un devis ou ajoutez un fichier.</div>';
+    } else {
+      lib.innerHTML = docs.map((d) => {
+        const isDevis = d.kind === 'devis';
+        return `
+        <div class="pdf-lib-item" data-id="${esc(d.id)}">
+          <b>${esc(d.name)}</b>
+          <div class="meta">${isDevis ? 'Devis' : formatBytes(d.size)} · ${formatDate(d.updatedAt || d.createdAt)}</div>
+          <div class="doc-actions">
+            ${isDevis
+              ? `<button class="btn sm primary" type="button" data-edit-devis="${esc(d.id)}">Modifier</button>`
+              : `<button class="btn sm primary" type="button" data-use-pdf="${esc(d.id)}" data-name="${esc(d.name)}">Utiliser</button>
+                 <button class="btn sm" type="button" data-dl="${esc(d.id)}">↓</button>`}
+            <button class="btn sm danger" type="button" data-del-doc="${esc(d.id)}">×</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  const root = document;
+  root.querySelectorAll('[data-edit-devis]').forEach((btn) => {
+    btn.onclick = () => openDevis(btn.dataset.editDevis);
+  });
+
+  root.querySelectorAll('[data-dl]').forEach((btn) => {
+    btn.onclick = async () => {
+      try {
+        const { blob, name } = await fetchDocumentBlob(btn.dataset.dl);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+  });
+
+  root.querySelectorAll('[data-use-pdf]').forEach((btn) => {
+    btn.onclick = async () => {
+      try {
+        await useDocumentInStirling(btn.dataset.usePdf, btn.dataset.name);
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+  });
+
+  root.querySelectorAll('[data-rename]').forEach((btn) => {
+    btn.onclick = async () => {
+      const id = btn.dataset.rename;
+      const row = docs.find((d) => d.id === id);
+      const name = prompt('Nouveau nom', row?.name || '');
+      if (!name || !name.trim()) return;
+      try {
+        await api(`/api/admin/documents/${id}`, { method: 'PATCH', body: { name: name.trim() } });
+        toast('Document renommé');
+        await loadDocuments();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+  });
+
+  root.querySelectorAll('[data-del-doc]').forEach((btn) => {
+    btn.onclick = async () => {
+      if (!confirm('Supprimer ce document définitivement ?')) return;
+      try {
+        await api(`/api/admin/documents/${btn.dataset.delDoc}`, { method: 'DELETE' });
+        toast('Document supprimé');
+        await loadDocuments();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+  });
 }
 
 async function bootstrap() {
@@ -332,14 +644,35 @@ $('#logoutBtn').addEventListener('click', logout);
 
 $$('.nav-item[data-panel]').forEach((btn) => {
   btn.addEventListener('click', () => {
+    const id = btn.dataset.panel;
+    if (id === 'pdf') {
+      openPdfPanel('deviseur');
+      return;
+    }
     $$('.nav-item[data-panel]').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
-    const id = btn.dataset.panel;
     $$('.panel').forEach((p) => p.classList.remove('active'));
     $(`#panel-${id}`).classList.add('active');
     $('#pageTitle').textContent = id === 'config' ? 'Configuration' : id === 'documents' ? 'Documents' : 'Administration';
     if (id === 'documents') loadDocuments().catch((e) => alert(e.message));
   });
+});
+
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-pdf-tab]');
+  if (tab) {
+    switchPdfTab(tab.dataset.pdfTab);
+    return;
+  }
+  const goto = e.target.closest('[data-goto-pdf]');
+  if (goto) openPdfPanel(goto.dataset.gotoPdf || 'deviseur');
+});
+
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'souba-devis-saved') {
+    toast(`Devis enregistré : ${e.data.name || ''}`);
+    loadDocuments().catch(() => {});
+  }
 });
 
 const SOCIAL_LABELS = {
@@ -365,88 +698,6 @@ function formatDate(iso) {
   }
 }
 
-async function loadDocuments() {
-  const docs = await api('/api/admin/documents');
-  const box = $('#docList');
-  $('#docCount').textContent = docs.length ? `${docs.length} document${docs.length > 1 ? 's' : ''}` : 'Aucun document pour le moment';
-  if (!docs.length) {
-    box.innerHTML = '<div class="doc-empty">Aucun fichier. Uploadez un document ci-dessus.</div>';
-    return;
-  }
-  box.innerHTML = `
-    <table class="doc-table">
-      <thead><tr><th>Nom</th><th>Taille</th><th>Modifié</th><th>Note</th><th></th></tr></thead>
-      <tbody>
-        ${docs.map((d) => `
-          <tr data-id="${esc(d.id)}">
-            <td><b>${esc(d.name)}</b></td>
-            <td>${formatBytes(d.size)}</td>
-            <td>${formatDate(d.updatedAt || d.createdAt)}</td>
-            <td>${esc(d.note || '—')}</td>
-            <td>
-              <div class="doc-actions">
-                <button class="btn sm" type="button" data-dl="${esc(d.id)}">Télécharger</button>
-                <a class="btn sm" href="/pdf/" target="_blank" rel="noopener">PDF tools</a>
-                <button class="btn sm" type="button" data-rename="${esc(d.id)}">Renommer</button>
-                <button class="btn sm danger" type="button" data-del-doc="${esc(d.id)}">Supprimer</button>
-              </div>
-            </td>
-          </tr>`).join('')}
-      </tbody>
-    </table>`;
-
-  box.querySelectorAll('[data-dl]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.dl;
-      const res = await fetch(`/api/admin/documents/${id}/download`, {
-        headers: { Authorization: `Bearer ${token()}` }
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        alert(err.error || 'Téléchargement impossible');
-        return;
-      }
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      const cd = res.headers.get('Content-Disposition') || '';
-      const m = cd.match(/filename="?([^"]+)"?/);
-      a.href = URL.createObjectURL(blob);
-      a.download = m?.[1] || 'document';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-  });
-
-  box.querySelectorAll('[data-rename]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.rename;
-      const row = docs.find((d) => d.id === id);
-      const name = prompt('Nouveau nom', row?.name || '');
-      if (!name || !name.trim()) return;
-      try {
-        await api(`/api/admin/documents/${id}`, { method: 'PATCH', body: { name: name.trim() } });
-        toast('Document renommé');
-        await loadDocuments();
-      } catch (e) {
-        alert(e.message);
-      }
-    });
-  });
-
-  box.querySelectorAll('[data-del-doc]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('Supprimer ce document définitivement ?')) return;
-      try {
-        await api(`/api/admin/documents/${btn.dataset.delDoc}`, { method: 'DELETE' });
-        toast('Document supprimé');
-        await loadDocuments();
-      } catch (e) {
-        alert(e.message);
-      }
-    });
-  });
-}
-
 $('#docUploadBtn').addEventListener('click', async () => {
   const input = $('#docFile');
   const file = input.files?.[0];
@@ -454,24 +705,59 @@ $('#docUploadBtn').addEventListener('click', async () => {
     alert('Choisissez un fichier');
     return;
   }
-  const fd = new FormData();
-  fd.append('file', file);
-  const note = $('#docNote').value.trim();
-  if (note) fd.append('note', note);
   try {
-    await api('/api/admin/documents', { method: 'POST', body: fd });
+    await uploadDocumentFile(file, $('#docNote').value.trim());
     input.value = '';
     $('#docNote').value = '';
-    toast('Document uploadé');
-    $$('.nav-item[data-panel]').forEach((b) => b.classList.toggle('active', b.dataset.panel === 'documents'));
-    $$('.panel').forEach((p) => p.classList.remove('active'));
-    $('#panel-documents').classList.add('active');
-    $('#pageTitle').textContent = 'Documents';
+    toast('Document uploadé — visible aussi dans Outils PDF');
     await loadDocuments();
   } catch (e) {
     alert(e.message);
   }
 });
+
+$('#pdfLibUploadBtn').addEventListener('click', async () => {
+  const input = $('#pdfLibFile');
+  const file = input.files?.[0];
+  if (!file) {
+    alert('Choisissez un fichier (ex. PDF traité exporté depuis Fusion)');
+    return;
+  }
+  try {
+    await uploadDocumentFile(file, 'Depuis Outils PDF');
+    input.value = '';
+    toast('Ajouté à Documents et à la bibliothèque');
+    await loadDocuments();
+  } catch (e) {
+    alert(e.message);
+  }
+});
+
+// Drag & drop résultat PDF dans la bibliothèque Outils PDF
+(() => {
+  const zone = $('#pdfLibList')?.parentElement;
+  if (!zone) return;
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.style.outline = '2px dashed var(--accent-ink)';
+  });
+  zone.addEventListener('dragleave', () => {
+    zone.style.outline = '';
+  });
+  zone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    zone.style.outline = '';
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    try {
+      await uploadDocumentFile(file, 'Depuis Outils PDF');
+      toast('Fichier ajouté à la bibliothèque');
+      await loadDocuments();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+})();
 
 function renderSocial() {
   const box = $('#socialList');

@@ -61,9 +61,12 @@
   .btn.primary:hover{background:var(--ink)}
   .btn.gold{background:var(--gold-deep); border-color:var(--gold-deep); color:#fff}
   .btn.gold:hover{filter:brightness(.95)}
+  #saveStatus b{color:var(--accent-ink);font-weight:600;text-transform:none;letter-spacing:0}
 
   /* ---------- LAYOUT ---------- */
   .stage{display:grid; grid-template-columns:minmax(380px,440px) 1fr; gap:0; min-height:calc(100vh - 62px)}
+  html.embedded .stage{min-height:calc(100vh - 62px)}
+  html.embedded .brand i{display:none}
   .editor{padding:24px 22px 80px; overflow:auto; border-right:1px solid var(--line); background:var(--bg)}
   .preview-pane{padding:34px; overflow:auto; background:
      repeating-linear-gradient(45deg, var(--bg-3) 0 1px, transparent 1px 11px); display:flex; justify-content:center; align-items:flex-start}
@@ -212,7 +215,7 @@
     <span><b>SOUBA</b> <i>Digital</i></span>
   </div>
   <div class="actions">
-    <a class="btn" href="/admin/">
+    <a class="btn" href="/admin/" id="backAdminBtn">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
       Administration
     </a>
@@ -220,12 +223,17 @@
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg>
       Nouveau
     </button>
+    <button class="btn primary" id="saveLibBtn" type="button">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h7l3 3v7H3z"/><path d="M6 13V8h4v5"/></svg>
+      Enregistrer
+    </button>
     <button class="btn gold" id="printBtn">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V6h12v6h-2M5 9h6v5H5z"/></svg>
       Imprimer / PDF
     </button>
   </div>
 </div>
+<p id="saveStatus" class="mono" style="margin:0;padding:6px 22px;background:var(--bg);border-bottom:1px solid var(--line-soft);color:var(--ink-mute)"></p>
 
 <div class="stage">
   <!-- ===== EDITOR ===== -->
@@ -370,10 +378,61 @@
 
 <script>
 const KEY = 'souba_deviseur_v1';
+const TOKEN_KEY = 'souba_admin_token';
 const $ = id => document.getElementById(id);
 const fmt = n => (Math.round(n)||0).toLocaleString('fr-FR');
 
 let items = [];
+let currentDevisId = null;
+let saveBusy = false;
+
+function authToken(){
+  try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
+}
+
+async function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  const token = authToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (opts.body && !(opts.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+    opts = { ...opts, body: JSON.stringify(opts.body) };
+  }
+  const res = await fetch(path, { ...opts, headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Erreur ${res.status}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function setStatus(msg){
+  const el = $('saveStatus');
+  if (el) el.innerHTML = msg || '';
+}
+
+function devisTitle(){
+  const num = ($('f_num').value || 'Devis').trim();
+  const client = ($('c_name').value || '').trim();
+  return client ? `${num} — ${client}` : num;
+}
+
+function collectPayload(){
+  const data = { items };
+  document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el => {
+    if (el.id) data[el.id] = el.value;
+  });
+  return data;
+}
+
+function applyPayload(data){
+  items = data.items || defaultItems();
+  Object.keys(data).forEach(k => {
+    if (k !== 'items' && $(k)) $(k).value = data[k];
+  });
+  if (!$('f_date').value) $('f_date').value = new Date().toISOString().slice(0,10);
+}
 
 function defaultItems(){
   return [
@@ -474,26 +533,81 @@ function update(){
   $('p_bk_prov').textContent = bkP || 'Banque';
   $('p_bk_rib').textContent = bkR;
 
-  save();
+  saveLocal();
 }
 
-/* ---- persistence ---- */
-function save(){
-  const data = {items};
-  document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el=>{ if(el.id) data[el.id]=el.value; });
-  localStorage.setItem(KEY, JSON.stringify(data));
+/* ---- persistence locale (brouillon) ---- */
+function saveLocal(){
+  localStorage.setItem(KEY, JSON.stringify(collectPayload()));
 }
-function load(){
+function loadLocal(){
   let data=null;
   try{ data = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
   if(data){
-    items = data.items || defaultItems();
-    Object.keys(data).forEach(k=>{ if(k!=='items' && $(k)) $(k).value=data[k]; });
+    applyPayload(data);
   }else{
     items = defaultItems();
     $('f_date').value = new Date().toISOString().slice(0,10);
   }
   if(!$('f_date').value) $('f_date').value = new Date().toISOString().slice(0,10);
+}
+
+async function loadFromLibrary(id){
+  const { document: doc, payload } = await api(`/api/admin/devis/${id}`);
+  currentDevisId = doc.id;
+  applyPayload(payload);
+  renderItems();
+  update();
+  setStatus(`Devis bibliothèque : <b>${esc(doc.name)}</b> — modifiable, Enregistrer pour mettre à jour`);
+  try {
+    const url = new URL(location.href);
+    url.searchParams.set('id', id);
+    if (!url.searchParams.get('embed')) url.searchParams.set('embed', '1');
+    history.replaceState({}, '', url);
+  } catch {}
+}
+
+async function saveToLibrary(){
+  if (saveBusy) return;
+  if (!authToken()) {
+    alert('Reconnectez-vous à l’administration pour enregistrer le devis.');
+    return;
+  }
+  saveBusy = true;
+  const btn = $('saveLibBtn');
+  if (btn) btn.disabled = true;
+  setStatus('Enregistrement…');
+  try {
+    const payload = collectPayload();
+    const name = devisTitle();
+    const note = `Devis ${payload.f_num || ''} — ${payload.c_name || ''}`.trim();
+    let doc;
+    if (currentDevisId) {
+      doc = await api(`/api/admin/devis/${currentDevisId}`, {
+        method: 'PUT',
+        body: { name, note, payload }
+      });
+    } else {
+      doc = await api('/api/admin/devis', {
+        method: 'POST',
+        body: { name, note, payload }
+      });
+      currentDevisId = doc.id;
+    }
+    setStatus(`Enregistré dans Documents / Outils PDF : <b>${esc(doc.name)}</b>`);
+    try {
+      window.parent?.postMessage({ type: 'souba-devis-saved', id: doc.id, name: doc.name }, '*');
+    } catch {}
+    const url = new URL(location.href);
+    url.searchParams.set('id', doc.id);
+    history.replaceState({}, '', url);
+  } catch (e) {
+    setStatus('');
+    alert(e.message || 'Enregistrement impossible');
+  } finally {
+    saveBusy = false;
+    if (btn) btn.disabled = false;
+  }
 }
 
 /* ---- wire ---- */
@@ -503,6 +617,7 @@ document.querySelectorAll('.editor input, .editor textarea, .editor select').for
 });
 $('addItem').addEventListener('click',()=>{ items.push({desc:'',note:'',qty:1,pu:0}); renderItems(); update(); });
 $('printBtn').addEventListener('click', printDevis);
+$('saveLibBtn').addEventListener('click', () => saveToLibrary());
 
 function printDevis(){
   const wrap = document.querySelector('.sheet-wrap');
@@ -555,19 +670,47 @@ ${inlineStyles}
   win.document.close();
 }
 $('resetBtn').addEventListener('click',()=>{
-  if(confirm('Créer un nouveau devis vierge ? Le devis actuel sera effacé.')){
+  if(confirm('Créer un nouveau devis vierge ? Le brouillon local sera effacé (les devis déjà enregistrés restent en bibliothèque).')){
     localStorage.removeItem(KEY);
+    currentDevisId = null;
     items = defaultItems();
     document.querySelectorAll('.editor input, .editor textarea, .editor select').forEach(el=>{
       if(el.id && el.id!=='f_date') el.defaultValue!==undefined && (el.value=el.defaultValue);
     });
-    location.reload();
+    $('f_date').value = new Date().toISOString().slice(0,10);
+    const url = new URL(location.href);
+    url.searchParams.delete('id');
+    history.replaceState({}, '', url);
+    setStatus('Nouveau devis (non enregistré)');
+    renderItems();
+    update();
   }
 });
 
-load();
-renderItems();
-update();
+(async function boot(){
+  if (new URLSearchParams(location.search).get('embed') === '1') {
+    document.documentElement.classList.add('embedded');
+    const back = document.getElementById('backAdminBtn');
+    if (back) back.hidden = true;
+  }
+
+  const id = new URLSearchParams(location.search).get('id');
+  if (id && authToken()) {
+    try {
+      await loadFromLibrary(id);
+      return;
+    } catch (e) {
+      setStatus(`Impossible d’ouvrir le devis : ${esc(e.message)}`);
+    }
+  }
+
+  loadLocal();
+  renderItems();
+  update();
+  setStatus(currentDevisId
+    ? `Devis bibliothèque ouvert`
+    : 'Brouillon local — cliquez <b>Enregistrer</b> pour le garder dans Documents');
+})();
 </script>
 </body>
 </html>

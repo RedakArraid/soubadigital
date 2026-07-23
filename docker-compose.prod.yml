@@ -33,6 +33,8 @@ services:
       - ADMIN_DIR=/app/admin
       - ASSETS_DIR=/app/assets
       - DATA_DIR=/app/data
+      - ADMIN_PUBLIC_URL=https://admin.soubadigital.com
+      - NODE_ENV=production
     volumes:
       - ./data:/app/data
       - ./admin:/app/admin:ro
@@ -61,9 +63,13 @@ services:
       - .env
     environment:
       SYSTEM_ROOTURIPATH: /pdf
-      SECURITY_ENABLELOGIN: "true"
-      SECURITY_INITIALLOGIN_USERNAME: ${STIRLING_USER:-admin}
-      SECURITY_INITIALLOGIN_PASSWORD: ${STIRLING_PASSWORD}
+      SYSTEM_FRONTENDURL: https://admin.soubadigital.com/pdf
+      # Login Stirling OFF : sous /pdf le chemin relatif ./assets casse /pdf/login (404).
+      # L'accès reste protégé par le cookie admin Souba (Traefik ForwardAuth).
+      SECURITY_ENABLELOGIN: "false"
+      SECURITY_XFRAMEOPTIONS: SAMEORIGIN
+      STORAGE_ENABLED: "false"
+      STORAGE_SIGNING_ENABLED: "false"
       SYSTEM_DEFAULTLOCALE: fr-FR
       SYSTEM_MAXFILESIZE: "100"
       UI_APPNAME: SOUBA PDF
@@ -76,22 +82,27 @@ services:
       - ./data/stirling/logs:/logs
       - ./data/stirling/pipeline:/pipeline
       - ./data/stirling/customFiles:/customFiles
+      - ./data/stirling/storage:/storage
     networks:
       - traefik_network
     labels:
       - traefik.enable=true
+      - traefik.http.middlewares.souba-pdf-auth.forwardauth.address=http://admin:3000/api/auth/forward
+      - traefik.http.middlewares.souba-pdf-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.souba-pdf-auth.forwardauth.authResponseHeaders=X-Forwarded-User
       - traefik.http.routers.soubadigital-pdf.rule=Host(`admin.soubadigital.com`) && PathPrefix(`/pdf`)
       - traefik.http.routers.soubadigital-pdf.priority=100
       - traefik.http.routers.soubadigital-pdf.entrypoints=websecure
       - traefik.http.routers.soubadigital-pdf.tls=true
       - traefik.http.routers.soubadigital-pdf.tls.certresolver=mytlschallenge
+      - traefik.http.routers.soubadigital-pdf.middlewares=souba-pdf-auth
       - traefik.http.services.soubadigital-pdf.loadbalancer.server.port=8080
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/pdf/api/v1/info/status | grep -q UP || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 12
-      start_period: 60s
+      start_period: 90s
 
 networks:
   traefik_network:

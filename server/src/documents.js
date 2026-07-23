@@ -20,6 +20,10 @@ function writeMeta(docs) {
   fs.writeFileSync(META_PATH, JSON.stringify(docs, null, 2));
 }
 
+function newId(prefix = 'doc') {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export function listDocuments() {
   return readMeta().sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
 }
@@ -28,15 +32,16 @@ export function getDocument(id) {
   return readMeta().find((d) => d.id === id) || null;
 }
 
-export function addDocument({ originalName, storedName, mimeType, size, note = '' }) {
+export function addDocument({ originalName, storedName, mimeType, size, note = '', kind = 'file' }) {
   const docs = readMeta();
   const doc = {
-    id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: newId('doc'),
     name: originalName,
     storedName,
     mimeType: mimeType || 'application/octet-stream',
     size: size || 0,
     note: note || '',
+    kind: kind || 'file',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -53,7 +58,8 @@ export function updateDocument(id, patch) {
     ...docs[idx],
     ...patch,
     id: docs[idx].id,
-    storedName: docs[idx].storedName,
+    storedName: patch.storedName || docs[idx].storedName,
+    kind: docs[idx].kind || 'file',
     updatedAt: new Date().toISOString()
   };
   docs[idx] = next;
@@ -73,4 +79,44 @@ export function deleteDocument(id) {
 
 export function documentFilePath(doc) {
   return path.join(DOCUMENTS_DIR, doc.storedName);
+}
+
+export function readDevisPayload(doc) {
+  if (!doc || doc.kind !== 'devis') return null;
+  const filePath = documentFilePath(doc);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+export function saveDevisDocument({ id, name, note, payload }) {
+  const safeName = (name || 'Devis').trim() || 'Devis';
+  const body = JSON.stringify(payload || {}, null, 2);
+
+  if (id) {
+    const existing = getDocument(id);
+    if (!existing || existing.kind !== 'devis') return null;
+    const filePath = documentFilePath(existing);
+    fs.writeFileSync(filePath, body);
+    return updateDocument(id, {
+      name: safeName,
+      note: note ?? existing.note,
+      size: Buffer.byteLength(body),
+      mimeType: 'application/json'
+    });
+  }
+
+  const storedName = `${newId('devis')}.json`;
+  fs.writeFileSync(path.join(DOCUMENTS_DIR, storedName), body);
+  return addDocument({
+    originalName: safeName,
+    storedName,
+    mimeType: 'application/json',
+    size: Buffer.byteLength(body),
+    note: note || 'Devis SOUBA',
+    kind: 'devis'
+  });
 }
