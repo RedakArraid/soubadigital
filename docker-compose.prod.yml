@@ -49,6 +49,19 @@ services:
       - traefik.http.routers.soubadigital-admin.tls=true
       - traefik.http.routers.soubadigital-admin.tls.certresolver=mytlschallenge
       - traefik.http.services.soubadigital-admin.loadbalancer.server.port=3000
+      # Stubs Stirling (wau 403 / policies 404) — priorité > route /pdf
+      - traefik.http.routers.soubadigital-pdf-wau.rule=Host(`admin.soubadigital.com`) && Path(`/pdf/api/v1/info/wau`)
+      - traefik.http.routers.soubadigital-pdf-wau.priority=120
+      - traefik.http.routers.soubadigital-pdf-wau.entrypoints=websecure
+      - traefik.http.routers.soubadigital-pdf-wau.tls=true
+      - traefik.http.routers.soubadigital-pdf-wau.tls.certresolver=mytlschallenge
+      - traefik.http.routers.soubadigital-pdf-wau.service=soubadigital-admin
+      - traefik.http.routers.soubadigital-pdf-policies.rule=Host(`admin.soubadigital.com`) && PathPrefix(`/pdf/api/v1/policies`)
+      - traefik.http.routers.soubadigital-pdf-policies.priority=120
+      - traefik.http.routers.soubadigital-pdf-policies.entrypoints=websecure
+      - traefik.http.routers.soubadigital-pdf-policies.tls=true
+      - traefik.http.routers.soubadigital-pdf-policies.tls.certresolver=mytlschallenge
+      - traefik.http.routers.soubadigital-pdf-policies.service=soubadigital-admin
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 30s

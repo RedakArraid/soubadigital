@@ -104,6 +104,25 @@ app.post('/api/auth/sync-cookie', authMiddleware, (req, res) => {
 /** Traefik ForwardAuth — protège /pdf avec le cookie JWT admin Souba */
 app.get('/api/auth/forward', forwardAuthHandler);
 
+/**
+ * Stubs Stirling (METRICS off / Enterprise off) — évite 403/404 en console.
+ * Routés par Traefik (priorité > /pdf) vers l’admin.
+ */
+app.get('/pdf/api/v1/info/wau', (_req, res) => {
+  res.json({
+    weeklyActiveUsers: 0,
+    totalUniqueBrowsers: 0,
+    daysOnline: 0,
+    trackingSince: new Date(0).toISOString()
+  });
+});
+app.get('/pdf/api/v1/policies', (_req, res) => {
+  res.json([]);
+});
+app.get('/pdf/api/v1/policies/runs', (_req, res) => {
+  res.json([]);
+});
+
 app.get('/api/admin/config', authMiddleware, (_req, res) => {
   res.json(getSiteConfig());
 });
